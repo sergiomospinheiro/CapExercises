@@ -1,37 +1,52 @@
 package Lists;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ShopList {
 	
-	private static ShopList shopList;
-	private List<Shops> shopArrayList;
-	private Shops foodList;
-	private Shops otherList;
-	
+	private static ShopList shopListInstance;
+	private ArrayList <String> shopList;
 	
 	private ShopList () {
-		shopArrayList = new ArrayList<Shops>();
+		
+		shopList = new ArrayList<String>();
+		
 	}
 	
-	public static ShopList getShopList() {
-		if(shopList == null) {
-			shopList = new ShopList();
+	public static ShopList getShopListInstance () {
+		if(shopListInstance == null) {
+			shopListInstance = new ShopList();
 		}
 		
-		return shopList;
+		return shopListInstance;
 	}
 	
-	public boolean addShopList(Shops shops) {
-		if((shops == foodList || shops == otherList) && (!shopArrayList.contains(shops)) {
-			shopArrayList.add(shops);
-			return true;
-		}else { return false; }
-			
+	public boolean addItem (String item) {
+		
+		if((item.startsWith("Other") || item.startsWith("Food")) && !shopList.contains(item)) {
+			shopList.add(item);
+			return true; 
+		} else {
+			return false;
 		}
+				
+			}
+	
+	public void printFoodList () {
+		System.out.println("--------------------------------\nThis is your current Food List: \n");
+		shopList.stream()
+		.filter(item -> item.startsWith("Food"))
+		.forEach(System.out::println);
+		
 	}
 	
+	public void printOtherList() {
+		System.out.println("-------------------------------- \nThis is your current Other List: \n");
+		shopList.stream()
+		.filter(item -> item.startsWith("Other"))
+		.forEach(System.out::println);
+		
+	}
 	
 
 }

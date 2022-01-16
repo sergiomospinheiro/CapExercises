@@ -4,16 +4,21 @@ public class Main {
 
 	public static void main(String[] args) {
 		
-		ShopList shopList = ShopList.getShopList();
+		ShopList shopListInstance = ShopList.getShopListInstance();
 		
-		System.out.println(shopList);
+		shopListInstance.addItem("Other Tyres");
+		shopListInstance.addItem("Food Bananas");
+		shopListInstance.addItem("Other Tyres");
+		shopListInstance.addItem("Other Razor Blades");
+		shopListInstance.addItem("Other Notebook");
+		shopListInstance.addItem("Food Cabbage");
+		shopListInstance.addItem("Food Oranges");
+		shopListInstance.addItem("Food Oranges");
 		
-		Shops shops = new Shops();
+		shopListInstance.printFoodList();
 		
-		shops.setFoodList("Sopas");
-		shops.setOtherList("Preservativos");
+		shopListInstance.printOtherList();
 		
-		shopList.addShopList(shops);
 		
 		
 		
