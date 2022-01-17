@@ -6,6 +6,8 @@ public class ShopList {
 	
 	private static ShopList shopListInstance;
 	private ArrayList <String> shopList;
+	private boolean isValid = false;
+	
 	
 	private ShopList () {
 		
@@ -21,21 +23,39 @@ public class ShopList {
 		return shopListInstance;
 	}
 	
-	public boolean addItem (String item) {
-		
-		if((item.startsWith("Other") || item.startsWith("Food")) && !shopList.contains(item)) {
+	
+	
+	public void verifyItem(String item) {
+		if ((item.startsWith("Other") || item.startsWith("Food")) && !shopList.contains(item)) {
+			System.out.println("Ok");
+			isValid = true;
+		} else {
+			System.out.println("Item invalid!");
+			isValid = false;
+		}
+
+	}
+	
+	
+	
+	public boolean addItem(String item) {
+		verifyItem(item);
+		if (isValid) {
 			shopList.add(item);
-			return true; 
+			System.out.println(item + " has been added to the list");
+			return true;
 		} else {
 			return false;
 		}
-				
-			}
-	
+	}
+		
+			
+			
 	public void printFoodList () {
 		System.out.println("--------------------------------\nThis is your current Food List: \n");
 		shopList.stream()
 		.filter(item -> item.startsWith("Food"))
+		.map(item -> item.replace("Food", ""))
 		.forEach(System.out::println);
 		
 	}
@@ -44,6 +64,7 @@ public class ShopList {
 		System.out.println("-------------------------------- \nThis is your current Other List: \n");
 		shopList.stream()
 		.filter(item -> item.startsWith("Other"))
+		.map(item -> item.replace("Other", ""))
 		.forEach(System.out::println);
 		
 	}

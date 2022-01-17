@@ -14,6 +14,8 @@ public class Main {
 		shopListInstance.addItem("Food Cabbage");
 		shopListInstance.addItem("Food Oranges");
 		shopListInstance.addItem("Food Oranges");
+		shopListInstance.addItem("player");
+		shopListInstance.addItem("votes");
 		
 		shopListInstance.printFoodList();
 		
