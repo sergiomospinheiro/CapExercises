@@ -56,6 +56,7 @@ public class FindAverage {
 			Integer total = 0;
 			for(int i = 0; i < listIntegers.size() -1; i++ ) {
 				total += listIntegers.get(i);
+				System.out.println(listIntegers.get(i));
 			}
 			
 			Integer average = total / getDividerInteger();

@@ -20,30 +20,6 @@ public class Main {
 		
 		findAverage.findAverage();
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-//
-//		while(integersList.size() < 4) {
-//			System.out.println("Please insert a number!");
-//			integersList.add(in.nextInt());
-//			
-//		}
-//		
-//		integersList.getIntegersList();
-		
-	
-
-		
-		
 		in.close();
 		
 		
