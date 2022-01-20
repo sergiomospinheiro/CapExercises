@@ -12,9 +12,9 @@ public class Main {
 		
 		Scanner in = new Scanner(System.in);
 		
-		FindAverage findAverage = new FindAverage();
+		AverageList averageList = new AverageList();
 		
-		findAverage.getListIntegers();
+		FindAverage findAverage = new FindAverage();
 		
 		findAverage.getInput(in);
 		
