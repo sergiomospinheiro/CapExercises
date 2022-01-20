@@ -6,60 +6,36 @@ import javax.naming.AuthenticationException;
 
 public class FindAverage {
 
-		private Scanner scanner;
-		private int counter;
-		
-		private List<Integer> listIntegers;
-		private Integer dividerInteger;
-		
-		public FindAverage() {
-			
-			listIntegers = new ArrayList<Integer>();
-
-		}
+		private Scanner scanner;	
+		private AverageList averageList = new AverageList();
 		
 		
 		public void getInput (Scanner in) {
 			
-			
 			System.out.println("Please insert a number!");
+			
+			int counter = 0;
 			
 			while(counter < 4) {
 		
 				int number = in.nextInt();
-				addIntegersList(number);
+				averageList.addIntegersList(number);
 				counter++;
 			
 			} System.out.println("All numbers have been inserted!");
 			
 		}
 		
-		
-		public void addIntegersList (Integer number) {
-			listIntegers.add(number);
-					
-		}
-		
-		public Integer getDividerInteger () {
-			Integer dividerInteger = listIntegers.get(3);
-			return dividerInteger;
-			
-		}
-		
-		public List<Integer> getListIntegers() {
-			return listIntegers;
-		}
-		
-		
-		
+	
 		public void findAverage () {
 			Integer total = 0;
-			for(int i = 0; i < listIntegers.size() -1; i++ ) {
-				total += listIntegers.get(i);
-				System.out.println(listIntegers.get(i));
+
+			for(int i = 0; i < averageList.getListIntegers().size() -1; i++ ) {
+				total += averageList.getListIntegers().get(i);
+
 			}
 			
-			Integer average = total / getDividerInteger();
+			Integer average = total / averageList.getLastNumber();
 			
 			System.out.println("The average of the list is: " + average);
 			

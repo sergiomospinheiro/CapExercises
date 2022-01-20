@@ -12,13 +12,37 @@ public class Main {
 		
 		Scanner in = new Scanner(System.in);
 		
-		FindAverage findAverage = new FindAverage();
+		AverageList averageList = new AverageList();
 		
-		findAverage.getListIntegers();
+		FindAverage findAverage = new FindAverage();
 		
 		findAverage.getInput(in);
 		
 		findAverage.findAverage();
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+//
+//		while(integersList.size() < 4) {
+//			System.out.println("Please insert a number!");
+//			integersList.add(in.nextInt());
+//			
+//		}
+//		
+//		integersList.getIntegersList();
+		
+	
+
+		
 		
 		in.close();
 		
