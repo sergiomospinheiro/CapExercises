@@ -1,30 +1,34 @@
 package Lists;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ShopList {
-	
+
 	private static ShopList shopListInstance;
-	private ArrayList <String> shopList;
+	private List<String> shopList = new ArrayList<String>();
 	private boolean isValid = false;
-	
-	
-	private ShopList () {
-		
-		shopList = new ArrayList<String>();
-		
+
+	private ShopList() {
+
 	}
-	
-	public static ShopList getShopListInstance () {
-		if(shopListInstance == null) {
+
+	/*
+	 * Singleton instance
+	 */
+
+	public static ShopList getShopListInstance() {
+		if (shopListInstance == null) {
 			shopListInstance = new ShopList();
 		}
-		
+
 		return shopListInstance;
 	}
-	
-	
-	
+
+	/*
+	 * Verifies the type of item
+	 */
+
 	public void verifyItem(String item) {
 		if ((item.startsWith("Other") || item.startsWith("Food")) && !shopList.contains(item)) {
 			System.out.println("Ok");
@@ -35,9 +39,7 @@ public class ShopList {
 		}
 
 	}
-	
-	
-	
+
 	public boolean addItem(String item) {
 		verifyItem(item);
 		if (isValid) {
@@ -48,26 +50,23 @@ public class ShopList {
 			return false;
 		}
 	}
-		
-			
-			
-	public void printFoodList () {
+
+	/*
+	 * 
+	 */
+
+	public void printFoodList() {
 		System.out.println("--------------------------------\nThis is your current Food List: \n");
-		shopList.stream()
-		.filter(item -> item.startsWith("Food"))
-		.map(item -> item.replace("Food", ""))
-		.forEach(System.out::println);
-		
+		shopList.stream().filter(item -> item.startsWith("Food")).map(item -> item.replace("Food", ""))
+				.forEach(System.out::println);
+
 	}
-	
+
 	public void printOtherList() {
 		System.out.println("-------------------------------- \nThis is your current Other List: \n");
-		shopList.stream()
-		.filter(item -> item.startsWith("Other"))
-		.map(item -> item.replace("Other", ""))
-		.forEach(System.out::println);
-		
+		shopList.stream().filter(item -> item.startsWith("Other")).map(item -> item.replace("Other", ""))
+				.forEach(System.out::println);
+
 	}
-	
 
 }
