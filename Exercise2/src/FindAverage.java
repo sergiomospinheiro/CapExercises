@@ -25,9 +25,12 @@ public class FindAverage {
 
 	}
 
+	/*
+	 * It calculates the average of the values input
+	 */
+
 	public void findAverage() {
 		int total = 0;
-
 		for (int i = 0; i < averageList.getListIntegers().size() - 1; i++) {
 			total += averageList.getListIntegers().get(i);
 
