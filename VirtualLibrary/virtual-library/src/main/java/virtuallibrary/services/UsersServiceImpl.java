@@ -1,5 +1,5 @@
 package virtuallibrary.services;
 
-public class UsersServiceImpl {
+public class UsersServiceImpl implements UsersService {
 
 }
