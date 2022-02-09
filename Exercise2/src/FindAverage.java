@@ -33,7 +33,6 @@ public class FindAverage {
 		int total = 0;
 		for (int i = 0; i < averageList.getListIntegers().size() - 1; i++) {
 			total += averageList.getListIntegers().get(i);
-
 		}
 
 		int average = total / averageList.getLastNumber();
