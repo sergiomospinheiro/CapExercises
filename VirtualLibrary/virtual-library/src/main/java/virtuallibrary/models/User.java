@@ -9,38 +9,40 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 
-@Entity
-@Table(name = "user")
+@Entity(name = "user_spi")
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
-	private Integer userID;
+	private Long userId;
 
-	@Column(name = "first_name")
+	@Column(name = "first_name", nullable = false, length = 20)
 	private String firstName;
 
-	@Column(name = "last_name")
+	@Column(name = "last_name", nullable = false, length = 20)
 	private String lastName;
 
-	@Column(name = "email")
+	@Column(name = "email", nullable = false, length = 45)
 	private String email;
 
-	@Column(name = "age")
+	@Column(name = "age", nullable = false, length = 3)
 	private int age;
 
-	@ManyToMany // add stuff
-	private List<User> users = new ArrayList<>();
+	@ManyToMany(mappedBy = "users")
+	private List<Book> books = new ArrayList<>();
 
-	public int getUserID() {
-		return userID;
+	private User() {
+
 	}
 
-	public void setUserID(int userID) {
-		this.userID = userID;
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
 	}
 
 	public String getFirstName() {
@@ -75,12 +77,12 @@ public class User {
 		this.age = age;
 	}
 
-	public List<User> getUsers() {
-		return users;
+	public List<Book> getBooks() {
+		return books;
 	}
 
-	public void setUsers(List<User> users) {
-		this.users = users;
+	public void setBooks(List<Book> books) {
+		this.books = books;
 	}
 
 }
