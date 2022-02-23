@@ -28,8 +28,8 @@ public class BooksControllers {
 	}
 
 	@PostMapping("/getbook")
-	public Book getBook(@RequestParam Long bookId) {
-		return bookJpaRepository.getById(bookId);
+	public Book getBook(@RequestBody Book book) {
+		return bookJpaRepository.findByBookName(book.getBookName());
 	}
 
 	@PostMapping("/savebook")

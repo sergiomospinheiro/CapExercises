@@ -39,7 +39,7 @@ public class Book {
 	@JoinTable(name = "book_users_spi", joinColumns = @JoinColumn(name = "book_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
 	private List<User> users = new ArrayList<>();
 
-	private Book() {
+	public Book() {
 
 	}
 

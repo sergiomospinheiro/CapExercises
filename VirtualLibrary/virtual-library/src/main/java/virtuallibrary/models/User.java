@@ -33,7 +33,7 @@ public class User {
 	@ManyToMany(mappedBy = "users")
 	private List<Book> books = new ArrayList<>();
 
-	private User() {
+	public User() {
 
 	}
 
@@ -77,9 +77,9 @@ public class User {
 		this.age = age;
 	}
 
-	public List<Book> getBooks() {
-		return books;
-	}
+//	public List<Book> getBooks() {
+//		return books;
+//	}
 
 	public void setBooks(List<Book> books) {
 		this.books = books;

@@ -6,4 +6,6 @@ import virtuallibrary.models.Book;
 
 public interface BookJpaRepository extends JpaRepository<Book, Long> {
 
+	Book findByBookName(String bookName);
+
 }

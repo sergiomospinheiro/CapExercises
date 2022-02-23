@@ -6,4 +6,6 @@ import virtuallibrary.models.User;
 
 public interface UserJpaRepository extends JpaRepository<User, Long> {
 
+	User findByLastName(String lastName);
+
 }

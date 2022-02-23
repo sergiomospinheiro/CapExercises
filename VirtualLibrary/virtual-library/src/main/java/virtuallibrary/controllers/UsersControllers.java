@@ -28,8 +28,8 @@ public class UsersControllers {
 	}
 
 	@PostMapping("/getuser")
-	public User getUser(@RequestParam Long userId) {
-		return userJpaRepository.getById(userId);
+	public User getUser(@RequestBody User user) {
+		return userJpaRepository.findByLastName(user.getLastName());
 	}
 
 	@PostMapping("/saveuser")
