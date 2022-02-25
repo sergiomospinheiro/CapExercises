@@ -1,6 +1,6 @@
 package sergio.pinheiro.restaurantapi.models;
 
-import java.util.Date;
+import java.util.Calendar;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,32 +16,32 @@ public class Menu {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
-	private int id;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-//	public List<Order> getOrders() {
-//		return orders;
-//	}
-//
-//	public void setOrders(List<Order> orders) {
-//		this.orders = orders;
-//	}
+	private Integer id;
 
 	@Column(name = "dish_name")
 	private String dishName;
-	@Column(name = "active")
-	private boolean isActive;
+	@Column(name = "available")
+	private boolean isAvailable;
 	@Column(name = "week")
-	private Date week; // muitas dúvidas
-	@Column
-	private Order order;
+	private Calendar week; // muitas dúvidas week.set(Calendar.WEEK_OF_YEAR, 26)
+
+	// private Order order; // dúvidas
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+//	public Order getOrder() {
+//		return order;
+//	}
+//
+//	public void setOrder(Order order) {
+//		this.order = order;
+//	}
 
 	public String getDishName() {
 		return dishName;
@@ -51,19 +51,19 @@ public class Menu {
 		this.dishName = dishName;
 	}
 
-	public boolean isActive() {
-		return isActive;
+	public boolean isAvailable() {
+		return isAvailable;
 	}
 
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
+	public void setAvailable(boolean isAvailable) {
+		this.isAvailable = isAvailable;
 	}
 
-	public Date getWeek() {
+	public Calendar getWeek() {
 		return week;
 	}
 
-	public void setWeek(Date week) {
+	public void setWeek(Calendar week) {
 		this.week = week;
 	}
 

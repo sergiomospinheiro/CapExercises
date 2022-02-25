@@ -1,15 +1,14 @@
 package sergio.pinheiro.restaurantapi.models;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -21,24 +20,28 @@ public class Order {
 	@Column(name = "order_id")
 	private Integer orderId;
 
-	@Column(name = "transaction_id")
-	private String transactionId; // dúvidas
 	@Column(name = "dish_name")
 	private String dishName;
 	@Column(name = "customer_name")
 	private String customerName;
-	@Column(name = "quantity") // dúvidas se crio classe
+	@Column(name = "quantity")
 	private int quantity;
-	@Column(name = "customer_address")
-	private String customerAddress; // dúvidas se passa para classe Customer
+	@Column(name = "delivery_address")
+	private String deliveryAddress;
 	@Column(name = "order_date")
 	private Date orderDate; // testar
 
-//	@Autowired // dúvida
-//	private OrderStatus orderStatus;
+	@Enumerated(EnumType.STRING)
+	@Column(name = "order_status", columnDefinition = "varchar(255)")
+	private OrderStatus orderStatus;
 
-	@OneToMany(mappedBy = "")
-	private List<Menu> orders = new ArrayList<>();
+	public OrderStatus getOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(OrderStatus orderStatus) {
+		this.orderStatus = orderStatus;
+	}
 
 	public Integer getOrderId() {
 		return orderId;
@@ -46,14 +49,6 @@ public class Order {
 
 	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
-	}
-
-	public String getTransactionId() {
-		return transactionId;
-	}
-
-	public void setTransactionId(String transactionId) {
-		this.transactionId = transactionId;
 	}
 
 	public String getDishName() {
@@ -80,14 +75,6 @@ public class Order {
 		this.quantity = quantity;
 	}
 
-	public String getCustomerAddress() {
-		return customerAddress;
-	}
-
-	public void setCustomerAddress(String customerAddress) {
-		this.customerAddress = customerAddress;
-	}
-
 	public Date getOrderDate() {
 		return orderDate;
 	}
@@ -96,20 +83,12 @@ public class Order {
 		this.orderDate = orderDate;
 	}
 
-//	public OrderStatus getOrderStatus() {
-//		return orderStatus;
-//	}
+	public String getDeliveryAddress() {
+		return deliveryAddress;
+	}
 
-//	public void setOrderStatus(OrderStatus orderStatus) {
-//		this.orderStatus = orderStatus;
-//	}
-
-//	public List<Menu> getOrders() {
-//		return orders;
-//	}
-//
-//	public void setOrders(List<Menu> orders) {
-//		this.orders = orders;
-//	}
+	public void setDeliveryAddress(String deliveryAddress) {
+		this.deliveryAddress = deliveryAddress;
+	}
 
 }
