@@ -14,15 +14,15 @@ public class MenuService {
 	@Autowired
 	private MenuRepository menuRepository;
 
-	public List<Menu> getMenu() {
+	public List<Menu> getMenu(Integer week) {
+		return menuRepository.findByWeek(week);
+	}
 
+	public List<Menu> getAll() {
 		return menuRepository.findAll();
 	}
 
-//	public List<Menu> getMenuByAvailable() {
-//		return menuRepository.
-//	}
-
+	// must this be @Transactional?
 	public Menu save(Menu menu) {
 		return menuRepository.saveAndFlush(menu);
 	}

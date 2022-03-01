@@ -12,7 +12,7 @@ public class MenuToMenuDto {
 		MenuDto menuDto = new MenuDto();
 
 		menuDto.setDishname(menu.getDishName());
-		menuDto.setAvailable(menu.isAvailable());
+		// menuDto.setAvailable(menu.isAvailable());
 		menuDto.setWeek(menu.getWeek());
 		return menuDto;
 

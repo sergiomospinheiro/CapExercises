@@ -1,7 +1,5 @@
 package sergio.pinheiro.restaurantapi.models;
 
-import java.util.Calendar;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,10 +18,10 @@ public class Menu {
 
 	@Column(name = "dish_name")
 	private String dishName;
-	@Column(name = "available")
-	private boolean isAvailable;
+//	@Column(name = "available")
+//	private boolean isAvailable;
 	@Column(name = "week")
-	private Calendar week; // muitas dúvidas week.set(Calendar.WEEK_OF_YEAR, 26)
+	private Integer week; // muitas dúvidas week.set(Calendar.WEEK_OF_YEAR, 26)
 
 	// private Order order; // dúvidas
 
@@ -51,20 +49,20 @@ public class Menu {
 		this.dishName = dishName;
 	}
 
-	public boolean isAvailable() {
-		return isAvailable;
-	}
+//	public boolean isAvailable() {
+//		return isAvailable;
+//	}
+//
+//	public void setAvailable(boolean isAvailable) {
+//		this.isAvailable = isAvailable;
+//	}
 
-	public void setAvailable(boolean isAvailable) {
-		this.isAvailable = isAvailable;
-	}
-
-	public Calendar getWeek() {
-		return week;
-	}
-
-	public void setWeek(Calendar week) {
+	public void setWeek(Integer week) {
 		this.week = week;
+	}
+
+	public Integer getWeek() {
+		return week;
 	}
 
 }

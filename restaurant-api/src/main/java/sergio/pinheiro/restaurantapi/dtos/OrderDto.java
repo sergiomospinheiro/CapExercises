@@ -1,6 +1,8 @@
 package sergio.pinheiro.restaurantapi.dtos;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import sergio.pinheiro.restaurantapi.models.OrderStatus;
 
@@ -60,6 +62,12 @@ public class OrderDto {
 
 	public void setOrderStatus(OrderStatus orderStatus) {
 		this.orderStatus = orderStatus;
+	}
+
+	public Integer getWeekYear() {
+		Calendar instance = Calendar.getInstance(Locale.ENGLISH);
+		Integer week = instance.get(Calendar.WEEK_OF_YEAR);
+		return week;
 	}
 
 }

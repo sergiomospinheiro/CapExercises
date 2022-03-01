@@ -3,14 +3,13 @@ package sergio.pinheiro.restaurantapi.dtos;
 public abstract class Response {
 
 	private String status;
-	private String sentOn;
+	protected String sentOn;
 	private String statusCode;
 	private String transactionID;
 	private String msg;
 
-	// Data Formatter
-
-	// private List<MenuDto> resValues = new ArrayList<>();
+	public Response() {
+	}
 
 	public String getStatus() {
 		return status;
@@ -51,4 +50,5 @@ public abstract class Response {
 	public void setMsg(String msg) {
 		this.msg = msg;
 	}
+
 }
