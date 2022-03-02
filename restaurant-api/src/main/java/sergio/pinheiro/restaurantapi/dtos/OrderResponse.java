@@ -21,7 +21,7 @@ public class OrderResponse extends Response {
 
 	}
 
-	public OrderResponse okResponse(OrderDto orderDto) {
+	public OrderResponse sendOkResponse(OrderDto orderDto) {
 		OrderResponse okResponse = new OrderResponse();
 		UUID uuid = UUID.randomUUID();
 		String now = now();

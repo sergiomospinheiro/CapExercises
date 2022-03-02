@@ -15,8 +15,6 @@ public class OrderDtoToOrder {
 		order.setCustomerName(orderDto.getCustomerName());
 		order.setQuantity(orderDto.getQuantity());
 		order.setDeliveryAddress(orderDto.getDeliveryAddress());
-		order.setOrderDate(orderDto.getOrderDate());
-		order.setOrderStatus(orderDto.getOrderStatus());
 
 		return order;
 	}
