@@ -46,21 +46,18 @@ public class MenuController {
 
 		try {
 
-			menuService.save(addedMenu);
+			if (menuService.existsByDishName(menuDto.getDishName())) {
+				return menuResponse.sendNotOkResponse(menuDto);
+			}
 
-			// menuResponse.addResValues(menuDto);
+			menuService.save(addedMenu);
 
 		} catch (Exception e) {
 
-			return menuResponse.sendNotOkResponse();
+			System.out.println("ERROR: " + e.getMessage());
 		}
 
-		return menuResponse.sendOkResponse();
-
-//		
-//		try {
-//			if(menuService.existsBy)
-//		}
+		return menuResponse.sendOkResponse(menuDto);
 
 	}
 

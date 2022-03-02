@@ -27,6 +27,10 @@ public class MenuService {
 		return menuRepository.saveAndFlush(menu);
 	}
 
+	public boolean existsByDishName(String dishName) {
+		return menuRepository.existsByDishName(dishName);
+	}
+
 	public void delete(Menu menu) {
 		menuRepository.delete(menu);
 	}

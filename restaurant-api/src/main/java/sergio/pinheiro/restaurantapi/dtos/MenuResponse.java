@@ -20,29 +20,35 @@ public class MenuResponse extends Response {
 		resValues.add(menuDto);
 	}
 
-	public Response sendOkResponse() {
-		Response okResponse = new MenuResponse();
+	public MenuResponse sendOkResponse(MenuDto menuDto) {
+		MenuResponse okResponse = new MenuResponse();
 		UUID uuid = UUID.randomUUID();
-		setStatusCode("200");
-		setStatus("OK");
-		setSentOn("now");
-		setTransactionID(uuid.toString());
-		setMsg("Menu added successfully!");
+		String now = now();
 
-		// setResValues(this.addResValues(menuDto));
+		okResponse.setStatusCode("200");
+		okResponse.setStatus("OK");
+		okResponse.setSentOn(now);
+		okResponse.setTransactionID(uuid.toString());
+		okResponse.setMsg("Menu added successfully!");
+
+		okResponse.addResValues(menuDto);
 
 		return okResponse;
 
 	}
 
-	public Response sendNotOkResponse() {
-		Response notOkResponse = new MenuResponse();
+	public MenuResponse sendNotOkResponse(MenuDto menuDto) {
+		MenuResponse notOkResponse = new MenuResponse();
 		UUID uuid = UUID.randomUUID();
-		setStatusCode("500");
-		setStatus("NOK");
-		setSentOn("now");
-		setTransactionID(uuid.toString());
-		setMsg("Error: Fetch the error");
+		String now = now();
+
+		notOkResponse.setStatusCode("500");
+		notOkResponse.setStatus("NOK");
+		notOkResponse.setSentOn(now);
+		notOkResponse.setTransactionID(uuid.toString());
+		notOkResponse.setMsg("Error: Fetch the error");
+
+		notOkResponse.addResValues(menuDto);
 
 		return notOkResponse;
 	}

@@ -10,8 +10,6 @@ public interface MenuRepository extends JpaRepository<Menu, Integer> {
 
 	List<Menu> findByWeek(Integer week);
 
-//	public boolean existsByLicensePlateCar(String licensePlateCar) {
-//		return parkingSpotRepository.existsByLicensePlateCar(licensePlateCar);
-//	}
+	boolean existsByDishName(String dishName);
 
 }

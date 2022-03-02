@@ -1,5 +1,8 @@
 package sergio.pinheiro.restaurantapi.dtos;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public abstract class Response {
 
 	private String status;
@@ -7,6 +10,8 @@ public abstract class Response {
 	private String statusCode;
 	private String transactionID;
 	private String msg;
+
+	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd: HH:mm:ss";
 
 	public Response() {
 	}
@@ -49,6 +54,12 @@ public abstract class Response {
 
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+
+	public static String now() {
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+		return sdf.format(cal.getTime());
 	}
 
 }
