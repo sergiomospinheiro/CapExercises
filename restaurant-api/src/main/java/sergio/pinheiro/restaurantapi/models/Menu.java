@@ -21,9 +21,7 @@ public class Menu {
 //	@Column(name = "available")
 //	private boolean isAvailable;
 	@Column(name = "week")
-	private Integer week; // muitas dúvidas week.set(Calendar.WEEK_OF_YEAR, 26)
-
-	// private Order order; // dúvidas
+	private Integer week;
 
 	public Integer getId() {
 		return id;
@@ -32,14 +30,6 @@ public class Menu {
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
-//	public Order getOrder() {
-//		return order;
-//	}
-//
-//	public void setOrder(Order order) {
-//		this.order = order;
-//	}
 
 	public String getDishName() {
 		return dishName;

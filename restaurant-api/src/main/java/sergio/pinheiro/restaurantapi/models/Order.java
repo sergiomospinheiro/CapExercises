@@ -1,8 +1,6 @@
 package sergio.pinheiro.restaurantapi.models;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,7 +29,7 @@ public class Order {
 	@Column(name = "delivery_address")
 	private String deliveryAddress;
 	@Column(name = "order_date")
-	private Date orderDate; // testar
+	private Date orderDate;
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status", columnDefinition = "varchar(255)")
@@ -91,12 +89,6 @@ public class Order {
 
 	public void setDeliveryAddress(String deliveryAddress) {
 		this.deliveryAddress = deliveryAddress;
-	}
-
-	public Integer getWeekYear() {
-		Calendar instance = Calendar.getInstance(Locale.ENGLISH);
-		Integer week = instance.get(Calendar.WEEK_OF_YEAR);
-		return week;
 	}
 
 }
