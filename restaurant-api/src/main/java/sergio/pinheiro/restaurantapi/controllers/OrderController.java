@@ -9,6 +9,7 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,7 +57,7 @@ public class OrderController {
 
 		String orderDishName = orderDto.getDishName();
 
-		boolean isAvailable = weekMenu.stream().map(w -> w.getDishName()).equals(orderDishName);
+		boolean isAvailable = weekMenu.stream().anyMatch(w -> w.getDishName().equals(orderDishName));
 
 		try {
 			if (!isAvailable) {
@@ -83,5 +84,66 @@ public class OrderController {
 		return okResponse;
 
 	}
+
+	@PostMapping("/updateOrder")
+	public OrderResponse updateOrder(@RequestBody OrderDto orderDto) {
+
+		OrderResponse orderResponse = new OrderResponse();
+
+		Order order = orderDtoToOrder.convert(orderDto);
+
+		List<Order> allOrders = orderService.getAllOrders();
+
+		Integer orderId = orderDto.getOrderId();
+
+		boolean orderIsAvailable = allOrders.stream().anyMatch(o -> o.getOrderId().equals(orderId));
+
+		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto);
+
+		try {
+
+			if (!orderIsAvailable) {
+
+				orderResponse.sendNotOkResponse(orderDto);
+
+			}
+			order.setOrderStatus(OrderStatus.ORDER_PLACED);
+
+			String orderHour = okResponse.getSentOn();
+
+			Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
+
+			order.setOrderDate(orderDate);
+
+			orderService.save(order);
+
+		} catch (Exception e) {
+			System.out.println("ERROR: " + e.getMessage());
+		}
+
+		return okResponse;
+
+	}
+
+	// eventually change to post mapping //and response??
+//	@GetMapping("/getPurchaseStatus/{orderId}")
+//	public OrderStatus getPurchaseSatus(@PathVariable(value = "orderId") Integer orderId) {
+//
+//		return orderService.getOrderStatus(orderId);
+//
+//	}
+
+	// change to Post Mapping
+	@GetMapping("/getOrder/{orderId}")
+	public Order getOrder(@PathVariable(value = "orderId") Integer orderId) {
+
+		return orderService.getOrder(orderId);
+
+	}
+
+//	@GetMapping("/getCustomerName/{orderId}")
+//	public String getCustomerName(@PathVariable(value = "orderId") Integer orderId) {
+//		return orderService.getCustomerName(orderId);
+//	}
 
 }

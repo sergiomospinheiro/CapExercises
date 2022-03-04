@@ -61,4 +61,26 @@ public class MenuController {
 
 	}
 
+	@PostMapping("/updateMenu")
+	public Response updateMenu(@RequestBody MenuDto menuDto) {
+
+		Menu updatedMenu = menuDtoToMenu.convert(menuDto);
+
+		MenuResponse menuResponse = new MenuResponse();
+
+		try {
+
+			if (!menuService.existsByDishName(menuDto.getDishName())) {
+				return menuResponse.sendNotOkResponse(menuDto);
+
+			}
+			menuService.save(updatedMenu);
+
+		} catch (Exception e) {
+			System.out.println("ERROR: " + e.getMessage());
+		}
+		return menuResponse.sendOkResponse(menuDto);
+
+	}
+
 }

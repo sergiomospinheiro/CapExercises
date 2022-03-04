@@ -48,8 +48,6 @@ public class MenuResponse extends Response {
 		notOkResponse.setTransactionID(uuid.toString());
 		notOkResponse.setMsg("Error: Fetch the error");
 
-		notOkResponse.addResValues(menuDto);
-
 		return notOkResponse;
 	}
 

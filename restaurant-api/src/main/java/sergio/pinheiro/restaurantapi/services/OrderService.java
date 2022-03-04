@@ -26,4 +26,16 @@ public class OrderService {
 		orderRepository.delete(order);
 	}
 
+	public Order getOrder(Integer orderId) {
+		return orderRepository.findById(orderId).get();
+	}
+
+//	public OrderStatus getOrderStatus(Integer orderId) {
+//		return orderRepository.findOrderStatusByOrderId(orderId);
+//	}
+
+//	public String getCustomerName(Integer orderId) {
+//		return orderRepository.getCustomerNameByOrderId(orderId);
+//	}
+
 }
