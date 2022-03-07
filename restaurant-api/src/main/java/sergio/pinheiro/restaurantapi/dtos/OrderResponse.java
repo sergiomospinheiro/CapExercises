@@ -30,15 +30,19 @@ public class OrderResponse extends Response {
 		okResponse.setStatus("OK");
 		okResponse.setSentOn(now);
 		okResponse.setTransactionID(uuid.toString());
-		okResponse.setMsg("Order added successfully!");
 
+		if (!orderDto.getDishName().isEmpty()) {
+			okResponse.setMsg("Order added successfully!");
+			okResponse.addResValues(orderDto);
+		}
+		okResponse.setMsg("Order deleted successfully!");
 		okResponse.addResValues(orderDto);
 
 		return okResponse;
 
 	}
 
-	public OrderResponse sendNotOkResponse(OrderDto orderDto) {
+	public OrderResponse sendNotOkResponse() {
 		OrderResponse notOkResponse = new OrderResponse();
 		UUID uuid = UUID.randomUUID();
 		String now = now();
@@ -48,8 +52,6 @@ public class OrderResponse extends Response {
 		notOkResponse.setSentOn(now);
 		notOkResponse.setTransactionID(uuid.toString());
 		notOkResponse.setMsg("Error: Fetch the error");
-
-		notOkResponse.addResValues(orderDto);
 
 		return notOkResponse;
 	}

@@ -47,7 +47,7 @@ public class MenuController {
 		try {
 
 			if (menuService.existsByDishName(menuDto.getDishName())) {
-				return menuResponse.sendNotOkResponse(menuDto);
+				return menuResponse.sendNotOkResponse();
 			}
 
 			menuService.save(addedMenu);
@@ -71,7 +71,7 @@ public class MenuController {
 		try {
 
 			if (!menuService.existsByDishName(menuDto.getDishName())) {
-				return menuResponse.sendNotOkResponse(menuDto);
+				return menuResponse.sendNotOkResponse();
 
 			}
 			menuService.save(updatedMenu);

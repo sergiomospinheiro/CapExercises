@@ -37,7 +37,7 @@ public class MenuResponse extends Response {
 
 	}
 
-	public MenuResponse sendNotOkResponse(MenuDto menuDto) {
+	public MenuResponse sendNotOkResponse() {
 		MenuResponse notOkResponse = new MenuResponse();
 		UUID uuid = UUID.randomUUID();
 		String now = now();

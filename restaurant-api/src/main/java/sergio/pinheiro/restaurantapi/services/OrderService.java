@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import sergio.pinheiro.restaurantapi.models.Order;
+import sergio.pinheiro.restaurantapi.models.OrderStatus;
 import sergio.pinheiro.restaurantapi.repositories.OrderRepository;
 
 @Service
@@ -30,9 +31,15 @@ public class OrderService {
 		return orderRepository.findById(orderId).get();
 	}
 
-//	public OrderStatus getOrderStatus(Integer orderId) {
-//		return orderRepository.findOrderStatusByOrderId(orderId);
-//	}
+	public boolean existsById(Integer orderId) {
+		return orderRepository.existsById(orderId);
+
+	}
+
+	public OrderStatus getOrderStatus(Integer orderId) {
+		Order order = orderRepository.getById(orderId);
+		return order.getOrderStatus();
+	}
 
 //	public String getCustomerName(Integer orderId) {
 //		return orderRepository.getCustomerNameByOrderId(orderId);
