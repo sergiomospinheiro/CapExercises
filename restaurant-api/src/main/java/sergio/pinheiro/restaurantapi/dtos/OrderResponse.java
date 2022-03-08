@@ -21,7 +21,9 @@ public class OrderResponse extends Response {
 
 	}
 
-	public OrderResponse sendOkResponse(OrderDto orderDto) {
+	public OrderResponse sendOkResponse(OrderDto orderDto, String message) {
+//		OrderResponse okResponse = new OrderResponse(resValues);
+
 		OrderResponse okResponse = new OrderResponse();
 		UUID uuid = UUID.randomUUID();
 		String now = now();
@@ -31,12 +33,11 @@ public class OrderResponse extends Response {
 		okResponse.setSentOn(now);
 		okResponse.setTransactionID(uuid.toString());
 
-		if (!orderDto.getDishName().isEmpty()) {
+		if (orderDto.getOrderId().equals(null)) {
 			okResponse.setMsg("Order added successfully!");
 			okResponse.addResValues(orderDto);
 		}
-		okResponse.setMsg("Order deleted successfully!");
-		okResponse.addResValues(orderDto);
+		okResponse.setMsg("Order" + message + "successfully!");
 
 		return okResponse;
 

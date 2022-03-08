@@ -59,7 +59,7 @@ public class OrderController {
 			System.out.println("ERROR: " + e.getMessage());
 		}
 
-		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto);
+		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto, " added ");
 
 		String orderHour = okResponse.getSentOn();
 
@@ -96,7 +96,7 @@ public class OrderController {
 
 		order.setOrderStatus(OrderStatus.ORDER_PLACED);
 
-		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto);
+		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto, " updated ");
 
 		String orderHour = okResponse.getSentOn();
 
@@ -133,7 +133,7 @@ public class OrderController {
 
 		OrderDto cancelledOrderDto = orderToOrderDto.convert(order);
 
-		return orderResponse.sendOkResponse(cancelledOrderDto);
+		return orderResponse.sendOkResponse(cancelledOrderDto, " cancelled ");
 
 	}
 
@@ -154,7 +154,7 @@ public class OrderController {
 
 		Order order = orderDtoToOrder.convert(orderDto);
 
-		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto);
+		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto, " added ");
 
 		String orderHour = okResponse.getSentOn();
 
@@ -182,17 +182,33 @@ public class OrderController {
 
 	}
 
-//	// change to Post Mapping
+	@PostMapping("/getOrder")
+	public OrderResponse getOrder(@RequestBody OrderDto orderDto) {
+
+		OrderResponse orderResponse = new OrderResponse();
+
+		// Order order = orderDtoToOrder.convert(orderDto);
+
+		try {
+
+			if (!orderService.existsById(orderDto.getOrderId())) {
+
+				return orderResponse.sendNotOkResponse();
+
+			}
+
+		} catch (Exception e) {
+			System.out.println("ERROR: " + e.getMessage());
+		}
+
+		return orderResponse.sendOkResponse(orderDto, " fetched ");
+
+	}
+
+	// change to Post Mapping
 //	@GetMapping("/getOrder/{orderId}")
 //	public Order getOrder(@PathVariable(value = "orderId") Integer orderId) {
 //
 //		return orderService.getOrder(orderId);
-//
-//	}
-
-//	@GetMapping("/getCustomerName/{orderId}")
-//	public String getCustomerName(@PathVariable(value = "orderId") Integer orderId) {
-//		return orderService.getCustomerName(orderId);
-//	}
 
 }
