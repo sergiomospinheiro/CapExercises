@@ -6,9 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -110,13 +108,12 @@ public class OrderController {
 
 	}
 
-	// not working properly, to review
-	@DeleteMapping("/cancelOrder")
-	public OrderResponse cancelOrder(@RequestBody OrderDto orderDto) {
+	@PostMapping("/cancelOrder")
+	public OrderResponse cancelResponse(@RequestBody OrderDto orderDto) {
 
 		OrderResponse orderResponse = new OrderResponse();
 
-		Order order = orderDtoToOrder.convert(orderDto);
+		Integer orderId = orderDto.getOrderId();
 
 		try {
 
@@ -129,7 +126,10 @@ public class OrderController {
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
 		}
-		orderService.delete(order);
+
+		Order order = orderService.getOrder(orderId);
+
+		orderService.deleteById(orderId);
 
 		OrderDto cancelledOrderDto = orderToOrderDto.convert(order);
 
@@ -137,12 +137,35 @@ public class OrderController {
 
 	}
 
-	// eventually change to post mapping //and response??
-	@GetMapping("/getPurchaseStatus/{orderId}")
-	public OrderStatus getPurchaseSatus(@PathVariable(value = "orderId") Integer orderId) {
+//	@DeleteMapping("/cancelOrder/{orderId}")
+//	public OrderResponse cancelOrder(@PathVariable(value = "orderId") Integer orderId) {
+//
+//		OrderResponse orderResponse = new OrderResponse();
+//
+//		try {
+//
+//			if (!orderService.existsById(orderId)) {
+//
+//				return orderResponse.sendNotOkResponse();
+//
+//			}
+//
+//		} catch (Exception e) {
+//			System.out.println("ERROR: " + e.getMessage());
+//		}
+//
+//		Order order = orderService.getOrder(orderId);
+//
+//		orderService.deleteById(orderId);
+//
+//		OrderDto cancelledOrderDto = orderToOrderDto.convert(order);
+//
+//		return orderResponse.sendOkResponse(cancelledOrderDto, " cancelled ");
 
-		return orderService.getOrderStatus(orderId);
+	@PostMapping("/getPurchaseStatus")
+	public OrderStatus getPurchaseStatus(@RequestBody Order orderDto) {
 
+		return orderService.getOrderStatus(orderDto.getOrderId());
 	}
 
 	@PostMapping("/changePurchaseStatus")
@@ -187,8 +210,6 @@ public class OrderController {
 
 		OrderResponse orderResponse = new OrderResponse();
 
-		// Order order = orderDtoToOrder.convert(orderDto);
-
 		try {
 
 			if (!orderService.existsById(orderDto.getOrderId())) {
@@ -204,11 +225,5 @@ public class OrderController {
 		return orderResponse.sendOkResponse(orderDto, " fetched ");
 
 	}
-
-	// change to Post Mapping
-//	@GetMapping("/getOrder/{orderId}")
-//	public Order getOrder(@PathVariable(value = "orderId") Integer orderId) {
-//
-//		return orderService.getOrder(orderId);
 
 }

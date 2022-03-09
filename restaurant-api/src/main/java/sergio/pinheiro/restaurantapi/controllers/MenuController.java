@@ -46,8 +46,10 @@ public class MenuController {
 
 		try {
 
-			if (menuService.existsByDishName(menuDto.getDishName())) {
+			if (menuService.isOnSale(addedMenu)) {
+
 				return menuResponse.sendNotOkResponse();
+
 			}
 
 			menuService.save(addedMenu);

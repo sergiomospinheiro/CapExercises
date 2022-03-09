@@ -41,6 +41,11 @@ public class OrderService {
 		return order.getOrderStatus();
 	}
 
+	public void deleteById(Integer orderId) {
+		orderRepository.deleteById(orderId);
+
+	}
+
 //	public String getCustomerName(Integer orderId) {
 //		return orderRepository.getCustomerNameByOrderId(orderId);
 //	}

@@ -33,10 +33,8 @@ public class OrderResponse extends Response {
 		okResponse.setSentOn(now);
 		okResponse.setTransactionID(uuid.toString());
 
-		if (orderDto.getOrderId().equals(null)) {
-			okResponse.setMsg("Order added successfully!");
-			okResponse.addResValues(orderDto);
-		}
+		okResponse.addResValues(orderDto);
+
 		okResponse.setMsg("Order" + message + "successfully!");
 
 		return okResponse;
