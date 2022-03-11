@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +45,7 @@ public class OrderController {
 	}
 
 	@PostMapping("/addOrder")
-	public OrderResponse addOrder(@RequestBody OrderDto orderDto) throws ParseException {
+	public OrderResponse addOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
 
 		OrderResponse orderResponse = new OrderResponse();
 
@@ -74,7 +76,7 @@ public class OrderController {
 	}
 
 	@PostMapping("/updateOrder")
-	public OrderResponse updateOrder(@RequestBody OrderDto orderDto) throws ParseException {
+	public OrderResponse updateOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
 
 		OrderResponse orderResponse = new OrderResponse();
 
@@ -109,7 +111,7 @@ public class OrderController {
 	}
 
 	@PostMapping("/cancelOrder")
-	public OrderResponse cancelResponse(@RequestBody OrderDto orderDto) {
+	public OrderResponse cancelResponse(@Valid @RequestBody OrderDto orderDto) {
 
 		OrderResponse orderResponse = new OrderResponse();
 
@@ -137,33 +139,8 @@ public class OrderController {
 
 	}
 
-//	@DeleteMapping("/cancelOrder/{orderId}")
-//	public OrderResponse cancelOrder(@PathVariable(value = "orderId") Integer orderId) {
-//
-//		OrderResponse orderResponse = new OrderResponse();
-//
-//		try {
-//
-//			if (!orderService.existsById(orderId)) {
-//
-//				return orderResponse.sendNotOkResponse();
-//
-//			}
-//
-//		} catch (Exception e) {
-//			System.out.println("ERROR: " + e.getMessage());
-//		}
-//
-//		Order order = orderService.getOrder(orderId);
-//
-//		orderService.deleteById(orderId);
-//
-//		OrderDto cancelledOrderDto = orderToOrderDto.convert(order);
-//
-//		return orderResponse.sendOkResponse(cancelledOrderDto, " cancelled ");
-
 	@PostMapping("/getPurchaseStatus")
-	public OrderStatus getPurchaseStatus(@RequestBody Order orderDto) {
+	public OrderStatus getPurchaseStatus(@Valid @RequestBody Order orderDto) {
 
 		return orderService.getOrderStatus(orderDto.getOrderId());
 	}
@@ -206,7 +183,7 @@ public class OrderController {
 	}
 
 	@PostMapping("/getOrder")
-	public OrderResponse getOrder(@RequestBody OrderDto orderDto) {
+	public OrderResponse getOrder(@Valid @RequestBody OrderDto orderDto) {
 
 		OrderResponse orderResponse = new OrderResponse();
 

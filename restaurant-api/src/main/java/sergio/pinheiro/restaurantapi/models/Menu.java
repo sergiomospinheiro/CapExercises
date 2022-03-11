@@ -14,21 +14,20 @@ public class Menu {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
-	private Integer id;
+	private Integer menuId;
 
 	@Column(name = "dish_name")
 	private String dishName;
-//	@Column(name = "available")
-//	private boolean isAvailable;
+
 	@Column(name = "week")
 	private Integer week;
 
-	public Integer getId() {
-		return id;
+	public Integer getMenuId() {
+		return menuId;
 	}
 
-	public void setId(Integer id) {
-		this.id = id;
+	public void setId(Integer menuId) {
+		this.menuId = menuId;
 	}
 
 	public String getDishName() {
@@ -38,14 +37,6 @@ public class Menu {
 	public void setDishName(String dishName) {
 		this.dishName = dishName;
 	}
-
-//	public boolean isAvailable() {
-//		return isAvailable;
-//	}
-//
-//	public void setAvailable(boolean isAvailable) {
-//		this.isAvailable = isAvailable;
-//	}
 
 	public void setWeek(Integer week) {
 		this.week = week;

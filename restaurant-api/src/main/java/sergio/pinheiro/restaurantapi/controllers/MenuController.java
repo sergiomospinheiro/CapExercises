@@ -2,6 +2,8 @@ package sergio.pinheiro.restaurantapi.controllers;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,7 +41,7 @@ public class MenuController {
 	}
 
 	@PostMapping("/addMenu")
-	public Response addMenu(@RequestBody MenuDto menuDto) {
+	public Response addMenu(@Valid @RequestBody MenuDto menuDto) {
 		Menu addedMenu = menuDtoToMenu.convert(menuDto);
 
 		MenuResponse menuResponse = new MenuResponse();
@@ -64,7 +66,7 @@ public class MenuController {
 	}
 
 	@PostMapping("/updateMenu")
-	public Response updateMenu(@RequestBody MenuDto menuDto) {
+	public Response updateMenu(@RequestBody @Valid MenuDto menuDto) {
 
 		Menu updatedMenu = menuDtoToMenu.convert(menuDto);
 

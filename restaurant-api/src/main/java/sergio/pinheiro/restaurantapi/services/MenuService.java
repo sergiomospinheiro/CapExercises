@@ -54,9 +54,6 @@ public class MenuService {
 
 	public boolean isOnSale(Menu menu) {
 
-//		Calendar instance = Calendar.getInstance(Locale.ENGLISH);
-//		Integer currentWeek = instance.get(Calendar.WEEK_OF_YEAR);
-
 		Integer salesWeek = menu.getWeek();
 
 		List<Menu> weekMenu = menuRepository.findByWeek(salesWeek);
