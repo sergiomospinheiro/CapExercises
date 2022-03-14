@@ -46,9 +46,9 @@ public class MenuService {
 
 		String orderDishName = order.getDishName();
 
-		boolean isAvailable = weekMenu.stream().anyMatch(w -> w.getDishName().equals(orderDishName));
+		boolean isOnSale = weekMenu.stream().anyMatch(w -> w.getDishName().equals(orderDishName));
 
-		return isAvailable;
+		return isOnSale;
 
 	}
 

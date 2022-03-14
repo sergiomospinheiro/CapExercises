@@ -17,9 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import sergio.pinheiro.restaurantapi.converters.OrderDtoToOrder;
 import sergio.pinheiro.restaurantapi.converters.OrderToOrderDto;
 import sergio.pinheiro.restaurantapi.dtos.OrderDto;
-import sergio.pinheiro.restaurantapi.dtos.OrderResponse;
 import sergio.pinheiro.restaurantapi.models.Order;
 import sergio.pinheiro.restaurantapi.models.OrderStatus;
+import sergio.pinheiro.restaurantapi.responses.OrderResponse;
 import sergio.pinheiro.restaurantapi.services.MenuService;
 import sergio.pinheiro.restaurantapi.services.OrderService;
 
@@ -53,7 +53,12 @@ public class OrderController {
 
 		try {
 			if (!menuService.isOnSale(order)) {
-				return orderResponse.sendNotOkResponse();
+				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
+			}
+
+			else if (orderDto.getQuantity() > 10) {
+				return orderResponse
+						.sendNotOkResponse(orderDto.getQuantity() + " exceeds the maximum of orders possible to ask");
 			}
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
@@ -86,10 +91,18 @@ public class OrderController {
 
 			if (!orderService.existsById(orderDto.getOrderId())) {
 
-				return orderResponse.sendNotOkResponse();
+				return orderResponse.sendNotOkResponse("Order not found!");
 
 			}
 
+			else if (!menuService.isOnSale(order)) {
+				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
+			}
+
+			// !orderDto.getCustomerName().equals(orderService.))
+			else if (!orderService.existsByCustomerName(orderDto.getCustomerName())) {
+				return orderResponse.sendNotOkResponse("Customer name is not changeable");
+			}
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
 		}
@@ -120,8 +133,11 @@ public class OrderController {
 		try {
 
 			if (!orderService.existsById(orderDto.getOrderId())) {
+				return orderResponse.sendNotOkResponse("Order not found!");
+			}
 
-				return orderResponse.sendNotOkResponse();
+			else if (orderService.getOrderStatus(orderId) != OrderStatus.ORDER_PLACED) {
+				return orderResponse.sendNotOkResponse("Your order is already in progress and cannot be cancelled");
 
 			}
 
@@ -140,7 +156,7 @@ public class OrderController {
 	}
 
 	@PostMapping("/getPurchaseStatus")
-	public OrderStatus getPurchaseStatus(@Valid @RequestBody Order orderDto) {
+	public OrderStatus getPurchaseStatus(@Valid @RequestBody OrderDto orderDto) {
 
 		return orderService.getOrderStatus(orderDto.getOrderId());
 	}
@@ -191,7 +207,7 @@ public class OrderController {
 
 			if (!orderService.existsById(orderDto.getOrderId())) {
 
-				return orderResponse.sendNotOkResponse();
+				return orderResponse.sendNotOkResponse("Order not found!");
 
 			}
 

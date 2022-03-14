@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import sergio.pinheiro.restaurantapi.converters.MenuDtoToMenu;
 import sergio.pinheiro.restaurantapi.dtos.MenuDto;
-import sergio.pinheiro.restaurantapi.dtos.MenuResponse;
-import sergio.pinheiro.restaurantapi.dtos.Response;
 import sergio.pinheiro.restaurantapi.models.Menu;
+import sergio.pinheiro.restaurantapi.responses.MenuResponse;
+import sergio.pinheiro.restaurantapi.responses.Response;
 import sergio.pinheiro.restaurantapi.services.MenuService;
 
 @RestController
@@ -50,7 +50,7 @@ public class MenuController {
 
 			if (menuService.isOnSale(addedMenu)) {
 
-				return menuResponse.sendNotOkResponse();
+				return menuResponse.sendNotOkResponse(menuDto.getDishName() + " is already inserted!");
 
 			}
 
@@ -75,7 +75,7 @@ public class MenuController {
 		try {
 
 			if (!menuService.existsByDishName(menuDto.getDishName())) {
-				return menuResponse.sendNotOkResponse();
+				return menuResponse.sendNotOkResponse(menuDto.getDishName() + " does not exist");
 
 			}
 			menuService.save(updatedMenu);

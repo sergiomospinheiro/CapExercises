@@ -1,8 +1,10 @@
-package sergio.pinheiro.restaurantapi.dtos;
+package sergio.pinheiro.restaurantapi.responses;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import sergio.pinheiro.restaurantapi.dtos.OrderDto;
 
 public class OrderResponse extends Response {
 
@@ -22,7 +24,6 @@ public class OrderResponse extends Response {
 	}
 
 	public OrderResponse sendOkResponse(OrderDto orderDto, String message) {
-//		OrderResponse okResponse = new OrderResponse(resValues);
 
 		OrderResponse okResponse = new OrderResponse();
 		UUID uuid = UUID.randomUUID();
@@ -41,7 +42,7 @@ public class OrderResponse extends Response {
 
 	}
 
-	public OrderResponse sendNotOkResponse() {
+	public OrderResponse sendNotOkResponse(String message) {
 		OrderResponse notOkResponse = new OrderResponse();
 		UUID uuid = UUID.randomUUID();
 		String now = now();
@@ -50,7 +51,7 @@ public class OrderResponse extends Response {
 		notOkResponse.setStatus("NOK");
 		notOkResponse.setSentOn(now);
 		notOkResponse.setTransactionID(uuid.toString());
-		notOkResponse.setMsg("Error: Fetch the error");
+		notOkResponse.setMsg("Error: " + message);
 
 		return notOkResponse;
 	}

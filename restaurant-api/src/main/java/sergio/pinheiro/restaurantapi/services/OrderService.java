@@ -46,6 +46,10 @@ public class OrderService {
 
 	}
 
+	public boolean existsByCustomerName(String customerName) {
+		return orderRepository.existsByCustomerName(customerName);
+	}
+
 //	public String getCustomerName(Integer orderId) {
 //		return orderRepository.getCustomerNameByOrderId(orderId);
 //	}

@@ -1,4 +1,4 @@
-package sergio.pinheiro.restaurantapi.dtos;
+package sergio.pinheiro.restaurantapi.responses;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

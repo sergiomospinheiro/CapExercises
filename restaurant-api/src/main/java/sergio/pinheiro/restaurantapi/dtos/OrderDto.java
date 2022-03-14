@@ -1,11 +1,23 @@
 package sergio.pinheiro.restaurantapi.dtos;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Positive;
+
 public class OrderDto {
 
 	private Integer orderId;
+
+	@NotEmpty
+	@Pattern(regexp = "^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\\s]+$")
 	private String dishName;
+	@Pattern(regexp = "^[a-zA-ZáàâãéèêíïóôõöúçñÁÀÂÃÉÈÍÏÓÔÕÖÚÇÑ\\s]+$")
 	private String customerName;
+	@NotNull
+	@Positive
 	private int quantity;
+	@NotEmpty
 	private String deliveryAddress;
 
 	public Integer getOrderId() {
