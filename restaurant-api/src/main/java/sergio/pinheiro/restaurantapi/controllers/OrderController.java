@@ -94,7 +94,7 @@ public class OrderController {
 
 			}
 
-			else if (!menuService.isOnSale(order)) { // test if this is working properly
+			else if (!menuService.isOnSale(order)) {
 				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
 			}
 
