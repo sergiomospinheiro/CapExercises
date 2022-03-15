@@ -57,8 +57,7 @@ public class OrderController {
 			}
 
 			else if (orderDto.getQuantity() > 10) {
-				return orderResponse
-						.sendNotOkResponse(orderDto.getQuantity() + " exceeds the maximum of orders possible to ask");
+				return orderResponse.sendNotOkResponse(orderDto.getQuantity() + " exceeds the limit of orders");
 			}
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
@@ -95,14 +94,22 @@ public class OrderController {
 
 			}
 
-			else if (!menuService.isOnSale(order)) {
+			else if (!menuService.isOnSale(order)) { // test if this is working properly
 				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
 			}
 
-			// !orderDto.getCustomerName().equals(orderService.))
 			else if (!orderService.existsByCustomerName(orderDto.getCustomerName())) {
 				return orderResponse.sendNotOkResponse("Customer name is not changeable");
 			}
+
+			else if (orderDto.getQuantity() > 10) {
+				return orderResponse.sendNotOkResponse(orderDto.getQuantity() + " exceeds the limit of orders");
+			}
+
+			else if (orderService.getOrderStatus(orderDto.getOrderId()) != OrderStatus.ORDER_PLACED) {
+				return orderResponse.sendNotOkResponse("We are sorry but the order is already in progress");
+			}
+
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
 		}
