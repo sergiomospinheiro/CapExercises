@@ -66,7 +66,7 @@ public class OrderController {
 
 		try {
 			if (!menuService.isOnSale(order)) {
-				log.error("O prato não está à venda");
+				log.error("This dish is not on sale");
 
 				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
 			}
@@ -99,14 +99,22 @@ public class OrderController {
 
 		OrderResponse orderResponse = new OrderResponse();
 
+		// the only use is to set orderStatus and date, and then save to the DB
 		Order order = orderDtoToOrder.convert(orderDto);
+
+		// to make a validation of the fetched order
 		Optional<Order> getOrder = Optional.of(orderService.getOrder(orderDto.getOrderId()));
+
+		// to build the object inserted through orderDto
 		Order testOrder = new Order();
+
+		// I believe it's a kind of debug to show the progress
 		boolean flagCheck = true;
 
 		try {
 
-			if (!getOrder.isPresent()) {
+			if (!getOrder.isPresent()) // does this verifies the entire object?
+			{
 				orderResponse = orderResponse.sendNotOkResponse("Order not found!");
 				flagCheck = false;
 			} else {
