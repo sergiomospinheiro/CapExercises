@@ -60,6 +60,12 @@ public class OrderDto {
 		this.deliveryAddress = deliveryAddress;
 	}
 
+	@Override
+	public String toString() {
+		return "OrderDto [orderId=" + orderId + ", dishName=" + dishName + ", customerName=" + customerName
+				+ ", quantity=" + quantity + ", deliveryAddress=" + deliveryAddress + "]";
+	}
+
 //	public Integer getWeekYear() {
 //		Calendar instance = Calendar.getInstance(Locale.ENGLISH);
 //		Integer week = instance.get(Calendar.WEEK_OF_YEAR);

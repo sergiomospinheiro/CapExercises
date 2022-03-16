@@ -8,6 +8,8 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import sergio.pinheiro.restaurantapi.converters.OrderToOrderDto;
 import sergio.pinheiro.restaurantapi.dtos.OrderDto;
 import sergio.pinheiro.restaurantapi.models.Order;
 import sergio.pinheiro.restaurantapi.models.OrderStatus;
+import sergio.pinheiro.restaurantapi.repositories.OrderRepository;
 import sergio.pinheiro.restaurantapi.responses.OrderResponse;
 import sergio.pinheiro.restaurantapi.services.MenuService;
 import sergio.pinheiro.restaurantapi.services.OrderService;
@@ -29,6 +32,8 @@ import sergio.pinheiro.restaurantapi.services.OrderService;
 @RestController
 @RequestMapping("/api/v1/")
 public class OrderController {
+
+	Logger log = LogManager.getLogger(OrderController.class);
 
 	@Autowired
 	private OrderService orderService;
@@ -42,6 +47,9 @@ public class OrderController {
 	@Autowired
 	private OrderToOrderDto orderToOrderDto;
 
+	@Autowired
+	private OrderRepository orderRepository;
+
 	@GetMapping("/getAllOrders")
 	public List<Order> getAllOrders() {
 		return orderService.getAllOrders();
@@ -50,12 +58,16 @@ public class OrderController {
 	@PostMapping("/addOrder")
 	public OrderResponse addOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
 
+		log.info("Estou no add: " + orderDto.toString());
+
 		OrderResponse orderResponse = new OrderResponse();
 
 		Order order = orderDtoToOrder.convert(orderDto);
 
 		try {
 			if (!menuService.isOnSale(order)) {
+				log.error("O prato não está à venda");
+
 				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
 			}
 
@@ -102,6 +114,7 @@ public class OrderController {
 				testOrder.setOrderId(getOrder.get().getOrderId());
 				testOrder.setDeliveryAddress(getOrder.get().getDeliveryAddress());
 				testOrder.setCustomerName(getOrder.get().getCustomerName());
+				testOrder.setOrderStatus(getOrder.get().getOrderStatus());
 
 				if (!menuService.isOnSale(testOrder)) {
 					orderResponse = orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
@@ -120,7 +133,9 @@ public class OrderController {
 				}
 
 				else if (testOrder.getOrderStatus() != OrderStatus.ORDER_PLACED) {
-					orderResponse.sendNotOkResponse("We are sorry but the order is already in progress");
+
+					orderResponse = orderResponse
+							.sendNotOkResponse("We are sorry but the order is already in progress");
 					flagCheck = false;
 				}
 			}
@@ -226,23 +241,37 @@ public class OrderController {
 	}
 
 	@PostMapping("/getOrder")
-	public OrderResponse getOrder(@Valid @RequestBody OrderDto orderDto) {
+	public ResponseEntity<OrderResponse> getOrder(@Valid @RequestBody OrderDto orderDto) {
 
 		OrderResponse orderResponse = new OrderResponse();
 
 		try {
+			Optional<Order> getOrder = orderRepository.findById(orderDto.getOrderId());
+			if (!getOrder.isPresent()) {
+				orderResponse = orderResponse.sendNotOkResponse("Order not found!");
+			} else {
 
-			if (!orderService.existsById(orderDto.getOrderId())) {
-
-				return orderResponse.sendNotOkResponse("Order not found!");
-
+				OrderToOrderDto orderToOrderDto = new OrderToOrderDto();
+				Order tmpOrder = new Order();
+				tmpOrder.setDishName(getOrder.get().getDishName());
+				tmpOrder.setCustomerName(getOrder.get().getCustomerName());
+				tmpOrder.setDeliveryAddress(getOrder.get().getDeliveryAddress());
+				tmpOrder.setQuantity(getOrder.get().getQuantity());
+				OrderDto convertOrder = orderToOrderDto.convert(tmpOrder);
+				orderResponse.addResValues(convertOrder);
+				orderResponse.setStatusCode("OK");
+				orderResponse.setMsg("Valores retornados");
+				// orderResponse.setTransactionID();
+				// setdate
 			}
 
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
+			orderResponse.setStatus("NOK");
+			orderResponse.setMsg("ERROR: " + e.getMessage());
 		}
 
-		return orderResponse.sendOkResponse(orderDto, " fetched ");
+		return new ResponseEntity<>(orderResponse, HttpStatus.OK);
 
 	}
 
