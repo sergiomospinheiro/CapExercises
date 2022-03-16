@@ -4,10 +4,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -80,53 +83,70 @@ public class OrderController {
 	}
 
 	@PostMapping("/updateOrder")
-	public OrderResponse updateOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
+	public ResponseEntity<OrderResponse> updateOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
 
 		OrderResponse orderResponse = new OrderResponse();
 
 		Order order = orderDtoToOrder.convert(orderDto);
+		Optional<Order> getOrder = Optional.of(orderService.getOrder(orderDto.getOrderId()));
+		Order testOrder = new Order();
+		boolean flagCheck = true;
 
 		try {
 
-			if (!orderService.existsById(orderDto.getOrderId())) {
+			if (!getOrder.isPresent()) {
+				orderResponse = orderResponse.sendNotOkResponse("Order not found!");
+				flagCheck = false;
+			} else {
+				testOrder.setDishName(getOrder.get().getDishName());
+				testOrder.setOrderId(getOrder.get().getOrderId());
+				testOrder.setDeliveryAddress(getOrder.get().getDeliveryAddress());
+				testOrder.setCustomerName(getOrder.get().getCustomerName());
 
-				return orderResponse.sendNotOkResponse("Order not found!");
+				if (!menuService.isOnSale(testOrder)) {
+					orderResponse = orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
+					flagCheck = false;
+				}
 
-			}
+				else if (!testOrder.getCustomerName().equals(orderDto.getCustomerName())) {
+					orderResponse = orderResponse.sendNotOkResponse("Customer name is not changeable");
+					flagCheck = false;
+				}
 
-			else if (!menuService.isOnSale(order)) {
-				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
-			}
+				else if (orderDto.getQuantity() > 10) {
+					orderResponse = orderResponse
+							.sendNotOkResponse(orderDto.getQuantity() + " exceeds the limit of orders");
+					flagCheck = false;
+				}
 
-			else if (!orderService.existsByCustomerName(orderDto.getCustomerName())) {
-				return orderResponse.sendNotOkResponse("Customer name is not changeable");
-			}
-
-			else if (orderDto.getQuantity() > 10) {
-				return orderResponse.sendNotOkResponse(orderDto.getQuantity() + " exceeds the limit of orders");
-			}
-
-			else if (orderService.getOrderStatus(orderDto.getOrderId()) != OrderStatus.ORDER_PLACED) {
-				return orderResponse.sendNotOkResponse("We are sorry but the order is already in progress");
+				else if (testOrder.getOrderStatus() != OrderStatus.ORDER_PLACED) {
+					orderResponse.sendNotOkResponse("We are sorry but the order is already in progress");
+					flagCheck = false;
+				}
 			}
 
 		} catch (Exception e) {
+			flagCheck = false;
 			System.out.println("ERROR: " + e.getMessage());
+			orderResponse = orderResponse.sendNotOkResponse("ERROR: " + e.getMessage());
 		}
 
-		order.setOrderStatus(OrderStatus.ORDER_PLACED);
+		if (flagCheck) {
 
-		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto, " updated ");
+			order.setOrderStatus(OrderStatus.ORDER_PLACED);
 
-		String orderHour = okResponse.getSentOn();
+			orderResponse = orderResponse.sendOkResponse(orderDto, " updated ");
 
-		Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
+			String orderHour = orderResponse.getSentOn();
 
-		order.setOrderDate(orderDate);
+			Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
 
-		orderService.save(order);
+			order.setOrderDate(orderDate);
 
-		return okResponse;
+			orderService.save(order);
+		}
+
+		return new ResponseEntity<>(orderResponse, HttpStatus.OK);
 
 	}
 

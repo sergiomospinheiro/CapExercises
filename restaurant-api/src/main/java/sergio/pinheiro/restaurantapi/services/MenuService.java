@@ -38,15 +38,15 @@ public class MenuService {
 		menuRepository.delete(menu);
 	}
 
-	public boolean isOnSale(Order order) {
-
+	public boolean isOnSale(Order getOrder) {
+		boolean isOnSale = false;
 		Calendar instance = Calendar.getInstance(Locale.ENGLISH);
 		Integer currentWeek = instance.get(Calendar.WEEK_OF_YEAR);
 		List<Menu> weekMenu = menuRepository.findByWeek(currentWeek);
 
-		String orderDishName = order.getDishName();
+		String orderDishName = getOrder.getDishName();
 
-		boolean isOnSale = weekMenu.stream().anyMatch(w -> w.getDishName().equals(orderDishName));
+		isOnSale = weekMenu.stream().anyMatch(w -> w.getDishName().equals(orderDishName));
 
 		return isOnSale;
 
