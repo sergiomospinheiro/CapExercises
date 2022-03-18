@@ -28,8 +28,30 @@ public class Order {
 	private int quantity;
 	@Column(name = "delivery_address")
 	private String deliveryAddress;
-	@Column(name = "order_date")
+	@Column(name = "order_date_start")
 	private Date orderDate;
+
+	@Column(name = "transaction_id")
+	private String transactionID;
+
+	@Column(name = "order_date_end")
+	private Date orderDateEnd;
+
+	public Date getOrderDateEnd() {
+		return orderDateEnd;
+	}
+
+	public void setOrderDateEnd(Date orderDateEnd) {
+		this.orderDateEnd = orderDateEnd;
+	}
+
+	public String getTransactionID() {
+		return transactionID;
+	}
+
+	public void setTransactionID(String transactionID) {
+		this.transactionID = transactionID;
+	}
 
 	@Enumerated(EnumType.STRING)
 	@Column(name = "order_status", columnDefinition = "varchar(255)")

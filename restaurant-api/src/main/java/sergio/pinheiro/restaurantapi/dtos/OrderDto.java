@@ -5,6 +5,8 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
+import sergio.pinheiro.restaurantapi.models.OrderStatus;
+
 public class OrderDto {
 
 	private Integer orderId;
@@ -19,6 +21,8 @@ public class OrderDto {
 	private int quantity;
 	@NotEmpty
 	private String deliveryAddress;
+
+	private OrderStatus orderStatus;
 
 	public Integer getOrderId() {
 		return orderId;
@@ -60,10 +64,19 @@ public class OrderDto {
 		this.deliveryAddress = deliveryAddress;
 	}
 
+	public OrderStatus getOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(OrderStatus orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+
 	@Override
 	public String toString() {
 		return "OrderDto [orderId=" + orderId + ", dishName=" + dishName + ", customerName=" + customerName
-				+ ", quantity=" + quantity + ", deliveryAddress=" + deliveryAddress + "]";
+				+ ", quantity=" + quantity + ", deliveryAddress=" + deliveryAddress + ", orderStatus=" + orderStatus
+				+ "]";
 	}
 
 //	public Integer getWeekYear() {

@@ -4,35 +4,33 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import sergio.pinheiro.restaurantapi.dtos.OrderDto;
+public class OrderResponse<T> extends Response {
 
-public class OrderResponse extends Response {
+	private List<T> resValues = new ArrayList<>();
 
-	private List<OrderDto> resValues = new ArrayList<>();
-
-	public List<OrderDto> getResValues() {
+	public List<T> getResValues() {
 		return resValues;
 	}
 
-	public void setResValues(List<OrderDto> resValues) {
+	public void setResValues(List<T> resValues) {
 		this.resValues = resValues;
 	}
 
-	public void addResValues(OrderDto orderDto) {
+	public void addResValues(T orderDto) {
 		resValues.add(orderDto);
 
 	}
 
-	public OrderResponse sendOkResponse(OrderDto orderDto, String message) {
+	public OrderResponse<T> sendOkResponse(T orderDto, String message) {
 
-		OrderResponse okResponse = new OrderResponse();
-		UUID uuid = UUID.randomUUID();
+		OrderResponse<T> okResponse = new OrderResponse<T>();
+		// UUID uuid = UUID.randomUUID();
 		String now = now();
 
 		okResponse.setStatusCode("200");
 		okResponse.setStatus("OK");
 		okResponse.setSentOn(now);
-		okResponse.setTransactionID(uuid.toString());
+		// okResponse.setTransactionID(uuid.toString());
 
 		okResponse.addResValues(orderDto);
 
@@ -42,8 +40,8 @@ public class OrderResponse extends Response {
 
 	}
 
-	public OrderResponse sendNotOkResponse(String message) {
-		OrderResponse notOkResponse = new OrderResponse();
+	public OrderResponse<T> sendNotOkResponse(String message) {
+		OrderResponse<T> notOkResponse = new OrderResponse<T>();
 		UUID uuid = UUID.randomUUID();
 		String now = now();
 

@@ -2,9 +2,11 @@ package sergio.pinheiro.restaurantapi.controllers;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -33,6 +35,8 @@ import sergio.pinheiro.restaurantapi.services.OrderService;
 @RequestMapping("/api/v1/")
 public class OrderController {
 
+	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd: HH:mm:ss";
+
 	Logger log = LogManager.getLogger(OrderController.class);
 
 	@Autowired
@@ -44,8 +48,8 @@ public class OrderController {
 	@Autowired
 	private OrderDtoToOrder orderDtoToOrder;
 
-	@Autowired
-	private OrderToOrderDto orderToOrderDto;
+	// @Autowired
+	// private OrderToOrderDto orderToOrderDto;
 
 	@Autowired
 	private OrderRepository orderRepository;
@@ -56,11 +60,14 @@ public class OrderController {
 	}
 
 	@PostMapping("/addOrder")
-	public OrderResponse addOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
+	public OrderResponse<Order> addOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
 
 		log.info("Estou no add: " + orderDto.toString());
 
-		OrderResponse orderResponse = new OrderResponse();
+		OrderResponse<Order> orderResponse = new OrderResponse<Order>();
+		OrderResponse<Order> okResponse = new OrderResponse<Order>();
+
+		String transactID = UUID.randomUUID().toString();
 
 		Order order = orderDtoToOrder.convert(orderDto);
 
@@ -74,78 +81,99 @@ public class OrderController {
 			else if (orderDto.getQuantity() > 10) {
 				return orderResponse.sendNotOkResponse(orderDto.getQuantity() + " exceeds the limit of orders");
 			}
+
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
+			String orderHour = sdf.format(cal.getTime());
+
+			Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
+
+			order.setOrderDate(orderDate);
+			order.setOrderDateEnd(orderDate);
+			order.setTransactionID(transactID);
+
+			order.setOrderStatus(OrderStatus.ORDER_PLACED);
+
+			orderService.save(order);
+
+			okResponse = orderResponse.sendOkResponse(order, " added ");
+			okResponse.setTransactionID(transactID);
+
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
 		}
-
-		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto, " added ");
-
-		String orderHour = okResponse.getSentOn();
-
-		Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
-
-		order.setOrderDate(orderDate);
-
-		order.setOrderStatus(OrderStatus.ORDER_PLACED);
-
-		orderService.save(order);
 
 		return okResponse;
 
 	}
 
 	@PostMapping("/updateOrder")
-	public ResponseEntity<OrderResponse> updateOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
+	public ResponseEntity<?> updateOrder(@RequestBody OrderDto orderDto) throws ParseException {
 
-		OrderResponse orderResponse = new OrderResponse();
+		OrderResponse<OrderDto> orderResponse = new OrderResponse<OrderDto>();
 
-		// the only use is to set orderStatus and date, and then save to the DB
-		Order order = orderDtoToOrder.convert(orderDto);
+		Order order = new Order();
 
-		// to make a validation of the fetched order
-		Optional<Order> getOrder = Optional.of(orderService.getOrder(orderDto.getOrderId()));
-
-		// to build the object inserted through orderDto
-		Order testOrder = new Order();
-
-		// I believe it's a kind of debug to show the progress
 		boolean flagCheck = true;
 
 		try {
 
-			if (!getOrder.isPresent()) // does this verifies the entire object?
-			{
-				orderResponse = orderResponse.sendNotOkResponse("Order not found!");
+			// validate if we have the OrderID
+			if (orderDto.getOrderId() == null) {
+				orderResponse = orderResponse.sendNotOkResponse("Missing the ID!");
 				flagCheck = false;
 			} else {
-				testOrder.setDishName(getOrder.get().getDishName());
-				testOrder.setOrderId(getOrder.get().getOrderId());
-				testOrder.setDeliveryAddress(getOrder.get().getDeliveryAddress());
-				testOrder.setCustomerName(getOrder.get().getCustomerName());
-				testOrder.setOrderStatus(getOrder.get().getOrderStatus());
+				// to make a validation of the fetched order
+				Optional<Order> getOrder = Optional.of(orderService.getOrder(orderDto.getOrderId()));
 
-				if (!menuService.isOnSale(testOrder)) {
-					orderResponse = orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
+				if (!getOrder.isPresent()) // it's throwing a no such element exception and not the response
+				{
+					orderResponse = orderResponse.sendNotOkResponse("Order not found!");
 					flagCheck = false;
+				} else {
+					order.setDishName(getOrder.get().getDishName()); // check
+					order.setOrderId(getOrder.get().getOrderId());
+					order.setCustomerName(getOrder.get().getCustomerName());
+					order.setQuantity(getOrder.get().getQuantity()); // check
+					order.setOrderStatus(getOrder.get().getOrderStatus());
+					order.setTransactionID(getOrder.get().getTransactionID());
+
+					if (orderDto.getDishName() == null && !order.getDishName().equals(orderDto.getDishName())) {
+
+						log.warn("User is trying to change the dish");
+
+					}
+
+					if (orderDto.getDeliveryAddress() != null
+							&& !getOrder.get().getDeliveryAddress().equals(orderDto.getDeliveryAddress())) {
+
+						order.setDeliveryAddress(orderDto.getDeliveryAddress());
+						flagCheck = true;
+					} else {
+						order.setDeliveryAddress(getOrder.get().getDeliveryAddress());
+					}
+
+					// não existe uma stream que encadeia?
+					if (!order.getOrderStatus().equals(OrderStatus.ORDER_PLACED)
+							&& !order.getOrderStatus().equals(OrderStatus.BEING_PREPARED) || orderDto.getQuantity() == 0
+							|| orderDto.getQuantity() > 30) {
+						orderResponse = orderResponse
+								.sendNotOkResponse(orderDto.getQuantity() + " not possible to insert");
+						flagCheck = false;
+					} else {
+						order.setQuantity(orderDto.getQuantity());
+						flagCheck = true;
+
+					}
+
+					if (orderDto.getOrderStatus().equals(null)) {
+						flagCheck = false;
+					} else {
+						orderService.changeOrderStatus(orderDto.getOrderStatus());
+					}
+
 				}
 
-				else if (!testOrder.getCustomerName().equals(orderDto.getCustomerName())) {
-					orderResponse = orderResponse.sendNotOkResponse("Customer name is not changeable");
-					flagCheck = false;
-				}
-
-				else if (orderDto.getQuantity() > 10) {
-					orderResponse = orderResponse
-							.sendNotOkResponse(orderDto.getQuantity() + " exceeds the limit of orders");
-					flagCheck = false;
-				}
-
-				else if (testOrder.getOrderStatus() != OrderStatus.ORDER_PLACED) {
-
-					orderResponse = orderResponse
-							.sendNotOkResponse("We are sorry but the order is already in progress");
-					flagCheck = false;
-				}
 			}
 
 		} catch (Exception e) {
@@ -156,15 +184,17 @@ public class OrderController {
 
 		if (flagCheck) {
 
-			order.setOrderStatus(OrderStatus.ORDER_PLACED);
-
 			orderResponse = orderResponse.sendOkResponse(orderDto, " updated ");
+			orderResponse.setTransactionID(order.getTransactionID());
 
 			String orderHour = orderResponse.getSentOn();
 
 			Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
 
-			order.setOrderDate(orderDate);
+			order.setOrderDate(orderDate); // maybe doesn't make sense because the orderDate should be the original
+											// order date
+
+			order.setOrderDateEnd(orderDate);
 
 			orderService.save(order);
 		}
@@ -173,85 +203,10 @@ public class OrderController {
 
 	}
 
-	@PostMapping("/cancelOrder")
-	public OrderResponse cancelResponse(@Valid @RequestBody OrderDto orderDto) {
-
-		OrderResponse orderResponse = new OrderResponse();
-
-		Integer orderId = orderDto.getOrderId();
-
-		try {
-
-			if (!orderService.existsById(orderDto.getOrderId())) {
-				return orderResponse.sendNotOkResponse("Order not found!");
-			}
-
-			else if (orderService.getOrderStatus(orderId) != OrderStatus.ORDER_PLACED) {
-				return orderResponse.sendNotOkResponse("Your order is already in progress and cannot be cancelled");
-
-			}
-
-		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage());
-		}
-
-		Order order = orderService.getOrder(orderId);
-
-		orderService.deleteById(orderId);
-
-		OrderDto cancelledOrderDto = orderToOrderDto.convert(order);
-
-		return orderResponse.sendOkResponse(cancelledOrderDto, " cancelled ");
-
-	}
-
-	@PostMapping("/getPurchaseStatus")
-	public OrderStatus getPurchaseStatus(@Valid @RequestBody OrderDto orderDto) {
-
-		return orderService.getOrderStatus(orderDto.getOrderId());
-	}
-
-	@PostMapping("/changePurchaseStatus")
-	public Order changePurchaseStatus(@RequestBody OrderDto orderDto) throws ParseException {
-
-		OrderResponse orderResponse = new OrderResponse();
-
-		OrderStatus orderStatus = orderService.getOrderStatus(orderDto.getOrderId());
-
-		Order order = orderDtoToOrder.convert(orderDto);
-
-		OrderResponse okResponse = orderResponse.sendOkResponse(orderDto, " added ");
-
-		String orderHour = okResponse.getSentOn();
-
-		Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
-
-		switch (orderStatus) {
-		case ORDER_PLACED:
-			order.setOrderStatus(OrderStatus.BEING_PREPARED);
-			order.setOrderDate(orderDate);
-			break;
-		case BEING_PREPARED:
-			order.setOrderStatus(OrderStatus.ON_THE_WAY);
-			order.setOrderDate(orderDate);
-			break;
-		case ON_THE_WAY:
-			order.setOrderStatus(OrderStatus.DELIVERED);
-			order.setOrderDate(orderDate);
-			break;
-		default:
-			System.out.println("The order has been delivered!");
-			break;
-		}
-
-		return orderService.save(order);
-
-	}
-
 	@PostMapping("/getOrder")
-	public ResponseEntity<OrderResponse> getOrder(@Valid @RequestBody OrderDto orderDto) {
+	public ResponseEntity<?> getOrder(@Valid @RequestBody OrderDto orderDto) {
 
-		OrderResponse orderResponse = new OrderResponse();
+		OrderResponse<OrderDto> orderResponse = new OrderResponse<OrderDto>();
 
 		try {
 			Optional<Order> getOrder = orderRepository.findById(orderDto.getOrderId());
