@@ -5,8 +5,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 
+import org.springframework.stereotype.Component;
+
 import sergio.pinheiro.restaurantapi.models.OrderStatus;
 
+@Component
 public class OrderDto {
 
 	private Integer orderId;
@@ -21,6 +24,9 @@ public class OrderDto {
 	private int quantity;
 	@NotEmpty
 	private String deliveryAddress;
+
+	@NotEmpty
+	private String transactionId;
 
 	private OrderStatus orderStatus;
 
@@ -70,6 +76,14 @@ public class OrderDto {
 
 	public void setOrderStatus(OrderStatus orderStatus) {
 		this.orderStatus = orderStatus;
+	}
+
+	public String getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	@Override

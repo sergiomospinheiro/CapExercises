@@ -32,7 +32,7 @@ public class Order {
 	private Date orderDate;
 
 	@Column(name = "transaction_id")
-	private String transactionID;
+	private String transactionId;
 
 	@Column(name = "order_date_end")
 	private Date orderDateEnd;
@@ -45,12 +45,12 @@ public class Order {
 		this.orderDateEnd = orderDateEnd;
 	}
 
-	public String getTransactionID() {
-		return transactionID;
+	public String getTransactionId() {
+		return transactionId;
 	}
 
-	public void setTransactionID(String transactionID) {
-		this.transactionID = transactionID;
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	@Enumerated(EnumType.STRING)

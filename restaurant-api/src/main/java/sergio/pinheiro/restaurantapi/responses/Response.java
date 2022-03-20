@@ -8,7 +8,7 @@ public abstract class Response {
 	private String status;
 	protected String sentOn;
 	private String statusCode;
-	private String transactionID;
+	private String transactionId;
 	private String msg;
 
 	public static final String DATE_FORMAT_NOW = "yyyy-MM-dd: HH:mm:ss";
@@ -40,12 +40,12 @@ public abstract class Response {
 		this.statusCode = statusCode;
 	}
 
-	public String getTransactionID() {
-		return transactionID;
+	public String getTransactionId() {
+		return transactionId;
 	}
 
-	public void setTransactionID(String transactionID) {
-		this.transactionID = transactionID;
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	public String getMsg() {

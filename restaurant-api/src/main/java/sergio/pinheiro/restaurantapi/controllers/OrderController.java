@@ -48,9 +48,6 @@ public class OrderController {
 	@Autowired
 	private OrderDtoToOrder orderDtoToOrder;
 
-	// @Autowired
-	// private OrderToOrderDto orderToOrderDto;
-
 	@Autowired
 	private OrderRepository orderRepository;
 
@@ -90,14 +87,14 @@ public class OrderController {
 
 			order.setOrderDate(orderDate);
 			order.setOrderDateEnd(orderDate);
-			order.setTransactionID(transactID);
+			order.setTransactionId(transactID);
 
 			order.setOrderStatus(OrderStatus.ORDER_PLACED);
 
 			orderService.save(order);
 
 			okResponse = orderResponse.sendOkResponse(order, " added ");
-			okResponse.setTransactionID(transactID);
+			okResponse.setTransactionId(transactID);
 
 		} catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
@@ -114,21 +111,36 @@ public class OrderController {
 
 		Order order = new Order();
 
+		OrderStatus orderStatusDto = orderDto.getOrderStatus(); // this can be null at this point
+
+		// this is null at this point // can I replace this for
+		// getOrder.getOrderStatus?
+
 		boolean flagCheck = true;
 
 		try {
 
-			// validate if we have the OrderID
-			if (orderDto.getOrderId() == null) {
-				orderResponse = orderResponse.sendNotOkResponse("Missing the ID!");
+			// validate if we have the OrderID // I've changed from getting orderID to
+			// transactionId
+			if (orderDto.getTransactionId() == null) {
+				orderResponse = orderResponse.sendNotOkResponse("Missing transactionId!");
 				flagCheck = false;
 			} else {
 				// to make a validation of the fetched order
-				Optional<Order> getOrder = Optional.of(orderService.getOrder(orderDto.getOrderId()));
 
-				if (!getOrder.isPresent()) // it's throwing a no such element exception and not the response
-				{
-					orderResponse = orderResponse.sendNotOkResponse("Order not found!");
+				Optional<Order> getOrder = Optional.of(orderService.getOrder(orderDto.getTransactionId()));
+				OrderStatus orderStatusModel = getOrder.get().getOrderStatus(); // make sure that the second validation
+																				// gets this \\ question of scope
+
+				if (!getOrder.isPresent() || !orderService.isOrderStatusValid(orderStatusModel)) {
+					orderResponse = orderResponse
+							.sendNotOkResponse("Order not found! or Order Status not possible to change"); // optimize
+																											// this //
+																											// the
+																											// method is
+																											// also
+																											// sending a
+																											// message
 					flagCheck = false;
 				} else {
 					order.setDishName(getOrder.get().getDishName()); // check
@@ -136,7 +148,7 @@ public class OrderController {
 					order.setCustomerName(getOrder.get().getCustomerName());
 					order.setQuantity(getOrder.get().getQuantity()); // check
 					order.setOrderStatus(getOrder.get().getOrderStatus());
-					order.setTransactionID(getOrder.get().getTransactionID());
+					order.setTransactionId(getOrder.get().getTransactionId());
 
 					if (orderDto.getDishName() == null && !order.getDishName().equals(orderDto.getDishName())) {
 
@@ -157,6 +169,7 @@ public class OrderController {
 					if (!order.getOrderStatus().equals(OrderStatus.ORDER_PLACED)
 							&& !order.getOrderStatus().equals(OrderStatus.BEING_PREPARED) || orderDto.getQuantity() == 0
 							|| orderDto.getQuantity() > 30) {
+						orderResponse.setTransactionId(order.getTransactionId());
 						orderResponse = orderResponse
 								.sendNotOkResponse(orderDto.getQuantity() + " not possible to insert");
 						flagCheck = false;
@@ -166,10 +179,21 @@ public class OrderController {
 
 					}
 
-					if (orderDto.getOrderStatus().equals(null)) {
-						flagCheck = false;
+					// validating order status
+
+//					OrderStatus orderStatusDto = orderDto.getOrderStatus();
+//
+//					OrderStatus orderStatusModel = order.getOrderStatus();
+
+					if (orderStatusDto != null && orderService.isOrderStatusValid(orderStatusModel)
+							&& orderService.changeOrderStatus(orderStatusDto, orderStatusModel)) {
+
+						order.setOrderStatus(orderStatusDto);
+						flagCheck = true;
 					} else {
-						orderService.changeOrderStatus(orderDto.getOrderStatus());
+						orderResponse.setTransactionId(order.getTransactionId());
+						orderResponse = orderResponse.sendNotOkResponse("Order can't be changed");
+						flagCheck = false;
 					}
 
 				}
@@ -180,12 +204,13 @@ public class OrderController {
 			flagCheck = false;
 			System.out.println("ERROR: " + e.getMessage());
 			orderResponse = orderResponse.sendNotOkResponse("ERROR: " + e.getMessage());
+
 		}
 
 		if (flagCheck) {
 
 			orderResponse = orderResponse.sendOkResponse(orderDto, " updated ");
-			orderResponse.setTransactionID(order.getTransactionID());
+			orderResponse.setTransactionId(order.getTransactionId());
 
 			String orderHour = orderResponse.getSentOn();
 
@@ -204,27 +229,32 @@ public class OrderController {
 	}
 
 	@PostMapping("/getOrder")
-	public ResponseEntity<?> getOrder(@Valid @RequestBody OrderDto orderDto) {
+	public ResponseEntity<?> getOrder(@RequestBody OrderDto orderDto) { // I have withdrawn the annotation @Valid
 
 		OrderResponse<OrderDto> orderResponse = new OrderResponse<OrderDto>();
 
 		try {
-			Optional<Order> getOrder = orderRepository.findById(orderDto.getOrderId());
+			Optional<Order> getOrder = orderRepository.findByTransactionId(orderDto.getTransactionId());
 			if (!getOrder.isPresent()) {
 				orderResponse = orderResponse.sendNotOkResponse("Order not found!");
 			} else {
 
 				OrderToOrderDto orderToOrderDto = new OrderToOrderDto();
 				Order tmpOrder = new Order();
+
 				tmpOrder.setDishName(getOrder.get().getDishName());
 				tmpOrder.setCustomerName(getOrder.get().getCustomerName());
 				tmpOrder.setDeliveryAddress(getOrder.get().getDeliveryAddress());
 				tmpOrder.setQuantity(getOrder.get().getQuantity());
+				tmpOrder.setTransactionId(getOrder.get().getTransactionId());
+				tmpOrder.setOrderStatus(getOrder.get().getOrderStatus());
+
 				OrderDto convertOrder = orderToOrderDto.convert(tmpOrder);
+
 				orderResponse.addResValues(convertOrder);
-				orderResponse.setStatusCode("OK");
+				orderResponse.setStatus("OK");
 				orderResponse.setMsg("Valores retornados");
-				// orderResponse.setTransactionID();
+//				orderResponse.setTransactionId();
 				// setdate
 			}
 

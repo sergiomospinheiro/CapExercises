@@ -30,7 +30,7 @@ public class MenuResponse extends Response {
 		okResponse.setStatusCode("200");
 		okResponse.setStatus("OK");
 		okResponse.setSentOn(now);
-		okResponse.setTransactionID(uuid.toString());
+		okResponse.setTransactionId(uuid.toString());
 		okResponse.setMsg("Menu added successfully!");
 
 		okResponse.addResValues(menuDto);
@@ -47,7 +47,7 @@ public class MenuResponse extends Response {
 		notOkResponse.setStatusCode("500");
 		notOkResponse.setStatus("NOK");
 		notOkResponse.setSentOn(now);
-		notOkResponse.setTransactionID(uuid.toString());
+		notOkResponse.setTransactionId(uuid.toString());
 		notOkResponse.setMsg("Error: " + message);
 
 		return notOkResponse;

@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import sergio.pinheiro.restaurantapi.dtos.OrderDto;
 import sergio.pinheiro.restaurantapi.models.Order;
 import sergio.pinheiro.restaurantapi.models.OrderStatus;
 import sergio.pinheiro.restaurantapi.repositories.OrderRepository;
@@ -29,8 +28,8 @@ public class OrderService {
 		orderRepository.delete(order);
 	}
 
-	public Order getOrder(Integer orderId) {
-		return orderRepository.findById(orderId).get();
+	public Order getOrder(String string) {
+		return orderRepository.findByTransactionId(string).get();
 	}
 
 	public boolean existsById(Integer orderId) {
@@ -53,66 +52,76 @@ public class OrderService {
 		return orderRepository.existsByCustomerName(customerName);
 	}
 
-	public boolean changeOrderStatus(OrderStatus orderStatus) {
+	// dividir em 2 métodos ( validação e mudança\switch)
+	public boolean isOrderStatusValid(OrderStatus orderStatusModel) {
 
-		OrderDto orderDto = new OrderDto();
-
-		Order order = new Order();
+		boolean orderStatusValidation = false;
 
 		OrderResponse<?> orderResponse = new OrderResponse<>();
 
-		if (orderDto.getOrderStatus().equals(OrderStatus.ORDER_PLACED)
-				|| order.getOrderStatus().equals(OrderStatus.DELIVERED)
-				|| (order.getOrderStatus() == (OrderStatus.ORDER_CANCELLED))) {
+		// took out -> orderStatusDto.equals(OrderStatus.ORDER_PLACED
 
-			orderResponse = orderResponse.sendNotOkResponse("We are sorry but that change can't be made");
-			// flagCheck = false;
+		if (orderStatusModel.equals(OrderStatus.DELIVERED) || (orderStatusModel == (OrderStatus.ORDER_CANCELLED))) {
+
+			orderResponse = orderResponse.sendNotOkResponse("Order can't be changed"); // this message is sent in the
+																						// controller also
+			orderStatusValidation = false;
+		} else {
+			orderStatusValidation = true;
 		}
 
-		switch (orderDto.getOrderStatus()) {
+		return orderStatusValidation;
+
+	}
+
+	public boolean changeOrderStatus(OrderStatus orderStatusDto, OrderStatus orderStatusModel) {
+
+		boolean orderStatusChangeable = false;
+		OrderResponse<?> orderResponse = new OrderResponse<>();
+
+		switch (orderStatusDto) {
+		case ORDER_PLACED:
+			orderResponse = orderResponse.sendNotOkResponse("Order is already placed");
+			break;
 		case BEING_PREPARED:
-			if (order.getOrderStatus() == OrderStatus.ORDER_PLACED) {
-				order.setOrderStatus(OrderStatus.BEING_PREPARED);
-				// flagCheck = true;
+			if (orderStatusModel == OrderStatus.ORDER_PLACED) {
+				orderStatusChangeable = true;
 			} else {
 				orderResponse = orderResponse.sendNotOkResponse("Purchase Status not Allowed");
-				// flagCheck = false;
 			}
 			break;
 		case ON_THE_WAY:
-			if (order.getOrderStatus() == OrderStatus.BEING_PREPARED) {
-				order.setOrderStatus(OrderStatus.ON_THE_WAY);
-				// flagCheck = true;
+			if (orderStatusModel == OrderStatus.BEING_PREPARED) {
+				orderStatusChangeable = true;
 			} else {
 				orderResponse = orderResponse.sendNotOkResponse("Purchase Status not Allowed");
-				// flagCheck = false;
+				// orderStatusValidation = false;
 			}
 			break;
 		case DELIVERED:
-			if (order.getOrderStatus() == OrderStatus.ON_THE_WAY) {
-				order.setOrderStatus(OrderStatus.DELIVERED);
-				// flagCheck = true;
+			if (orderStatusModel == OrderStatus.ON_THE_WAY) {
+				orderStatusChangeable = true;
+				// orderStatusValidation = true;
 
 			} else {
 				orderResponse = orderResponse.sendNotOkResponse("Purchase Status not Allowed");
-				// flagCheck = false;
+				// orderStatusValidation = false;
 			}
 
 			break;
 		case ORDER_CANCELLED:
-			if (order.getOrderStatus() != OrderStatus.ON_THE_WAY && order.getOrderStatus() != OrderStatus.DELIVERED) {
-				order.setOrderStatus(OrderStatus.ORDER_CANCELLED);
-				// flagCheck = true;
+			if (orderStatusModel != OrderStatus.ON_THE_WAY && orderStatusModel != OrderStatus.DELIVERED) {
+				orderStatusChangeable = true;
 
 			} else {
 				orderResponse = orderResponse.sendNotOkResponse("Purchase Status not Allowed");
-				// flagCheck = false;
+				// orderStatusValidation = false;
 			}
 		default:
 			System.out.println("The order has been delivered!"); // ?
 			break;
 		}
-		return true;
+		return orderStatusChangeable;
 
 	}
 

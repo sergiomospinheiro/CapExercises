@@ -10,11 +10,6 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
 	boolean existsByCustomerName(String customerName);
 
-	Optional<Order> findById(Integer orderId);
-//	OrderStatus findOrderStatusByOrderId(Integer orderId);
-//
-//	String findCustomerNameByOrderId(Integer orderId);
-//
-//	String getCustomerNameByOrderId(Integer orderId);
+	Optional<Order> findByTransactionId(String string);
 
 }
