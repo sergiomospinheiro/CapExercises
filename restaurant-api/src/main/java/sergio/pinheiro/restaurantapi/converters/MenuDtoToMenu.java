@@ -11,8 +11,11 @@ public class MenuDtoToMenu {
 	public Menu convert(MenuDto menuDto) {
 		Menu menu = new Menu();
 
+		// menu.setMenuId(menuDto.getMenuId());
 		menu.setDishName(menuDto.getDishName());
 		menu.setWeek(menuDto.getWeek());
+		menu.setAvailable(menuDto.isAvailable());
+		menu.setAvailableMeals(menuDto.getAvailableMeals());
 		return menu;
 
 	}

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sergio.pinheiro.restaurantapi.converters.OrderDtoToOrder;
 import sergio.pinheiro.restaurantapi.converters.OrderToOrderDto;
 import sergio.pinheiro.restaurantapi.dtos.OrderDto;
+import sergio.pinheiro.restaurantapi.models.Menu;
 import sergio.pinheiro.restaurantapi.models.Order;
 import sergio.pinheiro.restaurantapi.models.OrderStatus;
 import sergio.pinheiro.restaurantapi.repositories.OrderRepository;
@@ -41,6 +42,9 @@ public class OrderController {
 
 	@Autowired
 	private OrderService orderService;
+
+	@Autowired
+	private Menu menu;
 
 	@Autowired
 	private MenuService menuService;
@@ -68,6 +72,8 @@ public class OrderController {
 
 		Order order = orderDtoToOrder.convert(orderDto);
 
+		Integer dishesAv = menuService.getDishesQuantity(orderDto.getDishName());
+
 		try {
 			if (!menuService.isOnSale(order)) {
 				log.error("This dish is not on sale");
@@ -75,9 +81,11 @@ public class OrderController {
 				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
 			}
 
-			else if (orderDto.getQuantity() > 10) {
-				return orderResponse.sendNotOkResponse(orderDto.getQuantity() + " exceeds the limit of orders");
+			else if (menuService.isQuantityAvailable(dishesAv, orderDto.getQuantity()) == true) {
+				return orderResponse.sendNotOkResponse(orderDto.getQuantity() + " is not possible to order");
 			}
+
+			// checking if there are enough dishes
 
 			Calendar cal = Calendar.getInstance();
 			SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);

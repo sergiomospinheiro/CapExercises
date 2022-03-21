@@ -22,11 +22,17 @@ public class Menu {
 	@Column(name = "week")
 	private Integer week;
 
+	@Column(name = "availability")
+	private boolean available;
+
+	@Column(name = "available_meals")
+	private Integer availableMeals;
+
 	public Integer getMenuId() {
 		return menuId;
 	}
 
-	public void setId(Integer menuId) {
+	public void setMenuId(Integer menuId) {
 		this.menuId = menuId;
 	}
 
@@ -44,6 +50,28 @@ public class Menu {
 
 	public Integer getWeek() {
 		return week;
+	}
+
+	public boolean isAvailable() {
+		return available;
+	}
+
+	public void setAvailable(boolean available) {
+		this.available = available;
+	}
+
+	public Integer getAvailableMeals() {
+		return availableMeals;
+	}
+
+	public void setAvailableMeals(Integer availableMeals) {
+		this.availableMeals = availableMeals;
+	}
+
+	@Override
+	public String toString() {
+		return "Menu [menuId=" + menuId + ", dishName=" + dishName + ", week=" + week + ", available=" + available
+				+ ", availableMeals=" + availableMeals + "]";
 	}
 
 }

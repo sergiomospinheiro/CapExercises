@@ -22,7 +22,7 @@ public class MenuResponse extends Response {
 		resValues.add(menuDto);
 	}
 
-	public MenuResponse sendOkResponse(MenuDto menuDto) {
+	public MenuResponse sendOkResponse(MenuDto menuDto, String message) {
 		MenuResponse okResponse = new MenuResponse();
 		UUID uuid = UUID.randomUUID();
 		String now = now();
@@ -31,7 +31,7 @@ public class MenuResponse extends Response {
 		okResponse.setStatus("OK");
 		okResponse.setSentOn(now);
 		okResponse.setTransactionId(uuid.toString());
-		okResponse.setMsg("Menu added successfully!");
+		okResponse.setMsg("Menu" + message + " successfully!");
 
 		okResponse.addResValues(menuDto);
 

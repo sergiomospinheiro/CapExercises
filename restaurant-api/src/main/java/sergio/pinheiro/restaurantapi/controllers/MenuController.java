@@ -1,10 +1,13 @@
 package sergio.pinheiro.restaurantapi.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,7 +19,6 @@ import sergio.pinheiro.restaurantapi.converters.MenuDtoToMenu;
 import sergio.pinheiro.restaurantapi.dtos.MenuDto;
 import sergio.pinheiro.restaurantapi.models.Menu;
 import sergio.pinheiro.restaurantapi.responses.MenuResponse;
-import sergio.pinheiro.restaurantapi.responses.Response;
 import sergio.pinheiro.restaurantapi.services.MenuService;
 
 @RestController
@@ -41,16 +43,16 @@ public class MenuController {
 	}
 
 	@PostMapping("/addMenu")
-	public Response addMenu(@Valid @RequestBody MenuDto menuDto) {
+	public ResponseEntity<Object> addMenu(@Valid @RequestBody MenuDto menuDto) {
 		Menu addedMenu = menuDtoToMenu.convert(menuDto);
 
 		MenuResponse menuResponse = new MenuResponse();
 
 		try {
 
-			if (menuService.isOnSale(addedMenu)) {
+			if (menuService.exists(addedMenu)) {
 
-				return menuResponse.sendNotOkResponse(menuDto.getDishName() + " is already inserted!");
+				menuResponse = menuResponse.sendNotOkResponse(menuDto.getDishName() + " already exists!");
 
 			}
 
@@ -61,29 +63,76 @@ public class MenuController {
 			System.out.println("ERROR: " + e.getMessage());
 		}
 
-		return menuResponse.sendOkResponse(menuDto);
+		menuResponse = menuResponse.sendOkResponse(menuDto, " added ");
+
+		return new ResponseEntity<Object>(menuResponse, HttpStatus.OK);
 
 	}
 
 	@PostMapping("/updateMenu")
-	public Response updateMenu(@RequestBody @Valid MenuDto menuDto) {
-
-		Menu updatedMenu = menuDtoToMenu.convert(menuDto);
+	public ResponseEntity<Object> updateMenu(@Valid @RequestBody MenuDto menuDto) {
 
 		MenuResponse menuResponse = new MenuResponse();
 
+		Menu menu = new Menu();
+
+		boolean flagCheck = true;
+
 		try {
 
-			if (!menuService.existsByDishName(menuDto.getDishName())) {
-				return menuResponse.sendNotOkResponse(menuDto.getDishName() + " does not exist");
+			if (menuDto.getDishName() == null) {
+				menuResponse = menuResponse.sendNotOkResponse("Missing dish name!");
+				flagCheck = false;
+			} else {
+
+				Optional<Menu> getDish = Optional.of(menuService.getDish(menuDto.getDishName()));
+
+				if (!getDish.isPresent()) {
+					menuResponse = menuResponse.sendNotOkResponse(menuDto.getDishName() + " does not exist");
+					flagCheck = false;
+				} else {
+					menu.setMenuId(getDish.get().getMenuId());
+					menu.setDishName(getDish.get().getDishName());
+					menu.setAvailable(getDish.get().isAvailable());
+
+					if (menuDto.getAvailableMeals() == null) {
+						menu.setAvailableMeals(getDish.get().getAvailableMeals());
+						flagCheck = true;
+					} else {
+						menu.setAvailableMeals(menuDto.getAvailableMeals());
+						flagCheck = true;
+					}
+					if (menuDto.isAvailable() == null) {
+						menu.setAvailable(getDish.get().isAvailable());
+						flagCheck = true;
+					} else {
+						menu.setAvailable(menuDto.isAvailable());
+						flagCheck = true;
+					}
+					if (menuDto.getWeek() != null) {
+						menu.setWeek(menuDto.getWeek());
+						flagCheck = true;
+					} else {
+						menu.setWeek(getDish.get().getWeek());
+						flagCheck = true;
+					}
+
+				}
 
 			}
-			menuService.save(updatedMenu);
+		}
 
-		} catch (Exception e) {
+		catch (Exception e) {
 			System.out.println("ERROR: " + e.getMessage());
 		}
-		return menuResponse.sendOkResponse(menuDto);
+
+		if (flagCheck) {
+			menuResponse = menuResponse.sendOkResponse(menuDto, " updated ");
+
+			menuService.save(menu);
+		}
+
+		return new ResponseEntity<Object>(menuResponse, HttpStatus.OK);
 
 	}
 
