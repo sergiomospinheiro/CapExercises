@@ -52,24 +52,14 @@ public class OrderService {
 		return orderRepository.existsByCustomerName(customerName);
 	}
 
-	// dividir em 2 métodos ( validação e mudança\switch)
 	public boolean isOrderStatusValid(OrderStatus orderStatusModel) {
 
-		boolean orderStatusValidation = false;
+		boolean orderStatusValidation = true;
 
-		OrderResponse<?> orderResponse = new OrderResponse<>();
+		if (orderStatusModel.equals(OrderStatus.DELIVERED) || (orderStatusModel.equals(OrderStatus.ORDER_CANCELLED))) {
 
-		// took out -> orderStatusDto.equals(OrderStatus.ORDER_PLACED
-
-		if (orderStatusModel.equals(OrderStatus.DELIVERED) || (orderStatusModel == (OrderStatus.ORDER_CANCELLED))) {
-
-			orderResponse = orderResponse.sendNotOkResponse("Order can't be changed"); // this message is sent in the
-																						// controller also
 			orderStatusValidation = false;
-		} else {
-			orderStatusValidation = true;
 		}
-
 		return orderStatusValidation;
 
 	}
@@ -110,15 +100,15 @@ public class OrderService {
 
 			break;
 		case ORDER_CANCELLED:
-			if (orderStatusModel != OrderStatus.ON_THE_WAY && orderStatusModel != OrderStatus.DELIVERED) {
+			if (orderStatusModel != OrderStatus.ON_THE_WAY || orderStatusModel != OrderStatus.DELIVERED) {
 				orderStatusChangeable = true;
 
 			} else {
-				orderResponse = orderResponse.sendNotOkResponse("Purchase Status not Allowed");
+				orderResponse = orderResponse.sendNotOkResponse("Order can't be changed");
 				// orderStatusValidation = false;
 			}
 		default:
-			System.out.println("The order has been delivered!"); // ?
+			System.out.println("Order Status not valid");
 			break;
 		}
 		return orderStatusChangeable;

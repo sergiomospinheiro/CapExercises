@@ -18,7 +18,7 @@ public class MenuService {
 	private MenuRepository menuRepository;
 
 	public Menu getDish(String dishName) {
-		return menuRepository.findByDishName(dishName).get();
+		return menuRepository.findByActiveDish(dishName).get();
 	}
 
 	public List<Menu> getMenu(Integer week) {
@@ -64,23 +64,13 @@ public class MenuService {
 
 		boolean exists = menuList.stream().anyMatch(w -> w.getDishName().equals(menuDishName));
 
-//		Integer salesWeek = menu.getWeek();
-//
-//		List<Menu> weekMenu = menuRepository.findByWeek(salesWeek);
-//
-//		String menuDishName = menu.getDishName();
-//
-//		boolean isOnSale = weekMenu.stream().anyMatch(w -> w.getDishName().equals(menuDishName));
-
 		return exists;
 
 	}
 
-	// to be seen
-
-	public boolean isQuantityAvailable(int dishAvailableQt, int dishQtOrder) {
+	public boolean checkQuantityAvailable(int dishAvailableQt, int dishQtOrder) {
 		boolean available = true;
-		if (dishAvailableQt <= dishQtOrder) {
+		if (dishAvailableQt < dishQtOrder) {
 			available = false;
 		}
 
@@ -88,22 +78,11 @@ public class MenuService {
 
 	}
 
+	// to delete probably
 	public Integer getDishesQuantity(String dishName) {
 		Integer qtDishesAvailable = menuRepository.findByDishName(dishName).get().getAvailableMeals();
 		return qtDishesAvailable;
 
 	}
-
-//	public boolean isOnSale(Order getOrder) {
-//		boolean isOnSale = false;
-//		Calendar instance = Calendar.getInstance(Locale.ENGLISH);
-//		Integer currentWeek = instance.get(Calendar.WEEK_OF_YEAR);
-//		List<Menu> weekMenu = menuRepository.findByWeek(currentWeek);
-//
-//		String orderDishName = getOrder.getDishName();
-//
-//		isOnSale = weekMenu.stream().anyMatch(w -> w.getDishName().equals(orderDishName));
-//
-//		return isOnSale;
 
 }

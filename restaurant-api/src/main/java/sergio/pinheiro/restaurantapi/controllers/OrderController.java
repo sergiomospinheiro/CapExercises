@@ -44,9 +44,6 @@ public class OrderController {
 	private OrderService orderService;
 
 	@Autowired
-	private Menu menu;
-
-	@Autowired
 	private MenuService menuService;
 
 	@Autowired
@@ -61,7 +58,7 @@ public class OrderController {
 	}
 
 	@PostMapping("/addOrder")
-	public OrderResponse<Order> addOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
+	public ResponseEntity<?> addOrder(@Valid @RequestBody OrderDto orderDto) throws ParseException {
 
 		log.info("Estou no add: " + orderDto.toString());
 
@@ -72,20 +69,38 @@ public class OrderController {
 
 		Order order = orderDtoToOrder.convert(orderDto);
 
-		Integer dishesAv = menuService.getDishesQuantity(orderDto.getDishName());
+		Menu menu = new Menu();
+
+		int availableMeals = 0;
+
+		// Integer dishesAv = menuService.getDishesQuantity(orderDto.getDishName());
 
 		try {
 			if (!menuService.isOnSale(order)) {
 				log.error("This dish is not on sale");
 
-				return orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
+				orderResponse = orderResponse.sendNotOkResponse(orderDto.getDishName() + " is not on sale");
+			} else {
+
+				Optional<Menu> getMenu = Optional.of(menuService.getDish(orderDto.getDishName()));
+
+				availableMeals = getMenu.get().getAvailableMeals();
+
+				// tirei os sets de dois campos e espetei logo o objecto, medir consequências
+				menu = getMenu.get();
 			}
 
-			else if (menuService.isQuantityAvailable(dishesAv, orderDto.getQuantity()) == true) {
-				return orderResponse.sendNotOkResponse(orderDto.getQuantity() + " is not possible to order");
+			if (menuService.checkQuantityAvailable(availableMeals, orderDto.getQuantity()) == false) {
+				orderResponse = orderResponse.sendNotOkResponse("Article not available");
+			} else {
+				log.warn("Isto está a bombar!");
+				order.setQuantity(orderDto.getQuantity());
+
+				menu.setAvailableMeals(availableMeals - orderDto.getQuantity());
+
 			}
 
-			// checking if there are enough dishes
+			menuService.save(menu);
 
 			Calendar cal = Calendar.getInstance();
 			SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT_NOW);
@@ -108,7 +123,7 @@ public class OrderController {
 			System.out.println("ERROR: " + e.getMessage());
 		}
 
-		return okResponse;
+		return new ResponseEntity<>(okResponse, HttpStatus.OK);
 
 	}
 
@@ -119,50 +134,48 @@ public class OrderController {
 
 		Order order = new Order();
 
-		OrderStatus orderStatusDto = orderDto.getOrderStatus(); // this can be null at this point
+		Menu menu = new Menu();
 
-		// this is null at this point // can I replace this for
-		// getOrder.getOrderStatus?
+		OrderStatus orderStatusDto = orderDto.getOrderStatus();
 
 		boolean flagCheck = true;
+		boolean flagMenu = false;
+		boolean flagCancel = false;
 
 		try {
 
-			// validate if we have the OrderID // I've changed from getting orderID to
-			// transactionId
 			if (orderDto.getTransactionId() == null) {
 				orderResponse = orderResponse.sendNotOkResponse("Missing transactionId!");
 				flagCheck = false;
 			} else {
-				// to make a validation of the fetched order
+
+				// to make the validation of the fetched order
 
 				Optional<Order> getOrder = Optional.of(orderService.getOrder(orderDto.getTransactionId()));
-				OrderStatus orderStatusModel = getOrder.get().getOrderStatus(); // make sure that the second validation
-																				// gets this \\ question of scope
+				OrderStatus orderStatusModel = getOrder.get().getOrderStatus();
 
 				if (!getOrder.isPresent() || !orderService.isOrderStatusValid(orderStatusModel)) {
 					orderResponse = orderResponse
-							.sendNotOkResponse("Order not found! or Order Status not possible to change"); // optimize
-																											// this //
-																											// the
-																											// method is
-																											// also
-																											// sending a
-																											// message
+							.sendNotOkResponse("Order not found! or Order Status not possible to change");
+
 					flagCheck = false;
 				} else {
-					order.setDishName(getOrder.get().getDishName()); // check
+
+					String dishName = getOrder.get().getDishName();
+
+					Optional<Menu> getMenu = Optional.of(menuService.getDish(dishName));
+
+					menu = getMenu.get();
+
+					order.setDishName(getOrder.get().getDishName());
 					order.setOrderId(getOrder.get().getOrderId());
 					order.setCustomerName(getOrder.get().getCustomerName());
-					order.setQuantity(getOrder.get().getQuantity()); // check
+					order.setQuantity(getOrder.get().getQuantity());
 					order.setOrderStatus(getOrder.get().getOrderStatus());
 					order.setTransactionId(getOrder.get().getTransactionId());
+					order.setOrderDate(getOrder.get().getOrderDate());
 
-					if (orderDto.getDishName() == null && !order.getDishName().equals(orderDto.getDishName())) {
-
-						log.warn("User is trying to change the dish");
-
-					}
+					// validating delivery address
 
 					if (orderDto.getDeliveryAddress() != null
 							&& !getOrder.get().getDeliveryAddress().equals(orderDto.getDeliveryAddress())) {
@@ -173,38 +186,64 @@ public class OrderController {
 						order.setDeliveryAddress(getOrder.get().getDeliveryAddress());
 					}
 
-					// não existe uma stream que encadeia?
-					if (!order.getOrderStatus().equals(OrderStatus.ORDER_PLACED)
-							&& !order.getOrderStatus().equals(OrderStatus.BEING_PREPARED) || orderDto.getQuantity() == 0
-							|| orderDto.getQuantity() > 30) {
-						orderResponse.setTransactionId(order.getTransactionId());
-						orderResponse = orderResponse
-								.sendNotOkResponse(orderDto.getQuantity() + " not possible to insert");
-						flagCheck = false;
-					} else {
-						order.setQuantity(orderDto.getQuantity());
-						flagCheck = true;
+					if (orderDto.getQuantity() != 0) {
+
+						int updatedQtDifference = orderDto.getQuantity() - order.getQuantity();
+
+						int availableMeals = getMenu.get().getAvailableMeals();
+
+						boolean statusCount = menuService.checkQuantityAvailable(availableMeals, updatedQtDifference);
+
+						if (statusCount) {
+							menu.setAvailableMeals(availableMeals - updatedQtDifference);
+							order.setQuantity(orderDto.getQuantity());
+							flagMenu = true;
+							flagCheck = true;
+						}
 
 					}
-
-					// validating order status
-
-//					OrderStatus orderStatusDto = orderDto.getOrderStatus();
-//
-//					OrderStatus orderStatusModel = order.getOrderStatus();
 
 					if (orderStatusDto != null && orderService.isOrderStatusValid(orderStatusModel)
 							&& orderService.changeOrderStatus(orderStatusDto, orderStatusModel)) {
 
+						if (orderStatusDto == OrderStatus.ORDER_CANCELLED &&
+							 getOrder.get().getOrderStatus() != OrderStatus.ORDER_CANCELLED) {
+
+							int availableMenuMeals = getMenu.get().getAvailableMeals();
+							menu.setAvailableMeals(availableMenuMeals + order.getQuantity());
+							flagCheck = true;
+						} else {
+							orderResponse = orderResponse
+							.sendNotOkResponse("Order is Already Canclled!!");
+						}
+
 						order.setOrderStatus(orderStatusDto);
 						flagCheck = true;
-					} else {
-						orderResponse.setTransactionId(order.getTransactionId());
-						orderResponse = orderResponse.sendNotOkResponse("Order can't be changed");
-						flagCheck = false;
 					}
-
 				}
+
+			}
+			// if you have conditions to update values
+			if (flagCheck) {
+
+				orderResponse = orderResponse.sendOkResponse(orderDto, " updated ");
+				orderResponse.setTransactionId(order.getTransactionId());
+
+				String orderHour = orderResponse.getSentOn();
+
+				Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
+
+				order.setOrderDateEnd(orderDate);
+
+				orderService.save(order);
+
+				if (flagCancel) {
+					menuService.save(menu);
+				}
+
+				// update menu
+				if (flagMenu)
+					menuService.save(menu);
 
 			}
 
@@ -213,23 +252,6 @@ public class OrderController {
 			System.out.println("ERROR: " + e.getMessage());
 			orderResponse = orderResponse.sendNotOkResponse("ERROR: " + e.getMessage());
 
-		}
-
-		if (flagCheck) {
-
-			orderResponse = orderResponse.sendOkResponse(orderDto, " updated ");
-			orderResponse.setTransactionId(order.getTransactionId());
-
-			String orderHour = orderResponse.getSentOn();
-
-			Date orderDate = new SimpleDateFormat("yyyy-MM-dd: HH:mm:ss").parse(orderHour);
-
-			order.setOrderDate(orderDate); // maybe doesn't make sense because the orderDate should be the original
-											// order date
-
-			order.setOrderDateEnd(orderDate);
-
-			orderService.save(order);
 		}
 
 		return new ResponseEntity<>(orderResponse, HttpStatus.OK);

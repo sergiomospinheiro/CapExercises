@@ -25,7 +25,6 @@ public class OrderDto {
 	@NotEmpty
 	private String deliveryAddress;
 
-	@NotEmpty
 	private String transactionId;
 
 	private OrderStatus orderStatus;
